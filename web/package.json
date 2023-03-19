@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "dev": "vite",
+    "dev": "vite --port 3000",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "lint": "prettier --write ."
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "socket.io-client": "^4.6.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
