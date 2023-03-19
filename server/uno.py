@@ -26,7 +26,7 @@ class Card:
         return self.value in special_cards or self.color == 'black'
 
     def __repr__(self):
-        return f'{self.value} ({self.color})'
+        return f'Card(color={self.color}, value={self.value})'
 
 
 DECK = [Card(color, value)
@@ -40,6 +40,7 @@ PLAYERS = 2
 class Game:
     def __init__(self):
         self.deck = DECK
+        self.moves = []  # TODO: Maintain last moves for rule enforcing
 
     def new_game(self, hand_size):
         deck = self.deck[::]
@@ -73,12 +74,14 @@ class Game:
         new_card = self.remaining_cards.pop()
         player_cards.append(new_card)
 
+    # TODO: Log this
+    # TODO: make room functionality
     def play_card(self, player, card):
         player_cards = self.hands[player]
 
         played_card = Card(card['color'], card['value'])
         idx = [c.id for c in player_cards].index(played_card.id)
-        print(f'\n\n {played_card} {idx} \n\n') # TODO: Log this
+        print(f'\n\n {played_card} {idx} \n\n')
         player_cards.pop(idx)
 
         self.game_stack.append(played_card)
