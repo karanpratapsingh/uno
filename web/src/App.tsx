@@ -1,7 +1,7 @@
-import type { Component } from 'solid-js';
+import { useState } from 'react';
 
-const App: Component = () => {
-  return <h1 class='text-3xl font-bold underline'>Hello world!</h1>;
-};
+function App() {
+  return <div>HELLO</div>;
+}
 
 export default App;
