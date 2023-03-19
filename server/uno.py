@@ -42,7 +42,7 @@ class Game:
         self.deck = DECK
         self.moves = []  # TODO: Maintain last moves for rule enforcing
 
-    def new_game(self, hand_size):
+    def new(self, hand_size):
         deck = self.deck[::]
 
         for _ in range(SHUFFLE_FREQ):

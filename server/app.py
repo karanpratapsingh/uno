@@ -6,6 +6,7 @@ from uno import Game
 import collections
 from player import Player
 import logging
+from parsers import parse_game_state, parse_object_list
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -23,76 +24,64 @@ rooms = collections.defaultdict(set)
 
 @socketio.on('join')
 def on_join(data):
-    username = data['username']
+    name = data['name']
     room = data['room']
 
-    player = Player(username, room)
-    rooms[room].add(player)
+    player = Player(name, room)
+    players = rooms[room]
+
+    if player in players:
+        emit("room", {'players': parse_object_list(list(players))}, to=room)
+        return
+
+    players.add(player)
     join_room(room)
-    log.info(f"{player} has join room {room}")
-    emit("join", username + ' has entered the room.', to=room)
+    log.info(f"{player} has joined the room {room}")
+    emit("room", {'players': parse_object_list(list(players))}, to=room)
 
 
 @socketio.on('leave')
 def on_leave(data):
-    username = data['username']
+    name = data['name']
     room = data['room']
+
+    player = Player(name, room)
+    players = rooms[room]
+
+    if player not in players:
+        emit("room", {'players': parse_object_list(list(players))}, to=room)
+        return
+
+    players.remove(player)
     leave_room(room)
-    send(username + ' has left the room.', to=room)
 
-
-def parse_state(state):
-    (hands, remaining_cards, game_stack) = state
-
-    def parse_cards(cards):
-        return [card.__dict__ for card in cards]
-
-    parsed_hands = {
-        'player_1': parse_cards(hands['player_1']),
-        'player_2': parse_cards(hands['player_2']),
-    }
-    parsed_remaining_cards = parse_cards(remaining_cards)
-    parsed_game_stack = parse_cards(game_stack)
-
-    return {
-        'hands': parsed_hands,
-        'remaining_cards': parsed_remaining_cards,
-        'game_stack': parsed_game_stack
-    }
+    log.info(f"{player} has left the room {room}")
+    emit("room", {'players': parse_object_list(list(players))}, to=room)
 
 
 @socketio.on('new-game')
 def new_game(data):
-
-    game.new_game(data['hand_size'])
+    game.new(data['hand_size'])
     state = game.get_state()
-    emit("state-change", parse_state(state))
+    emit("state-change", parse_game_state(state))
 
 
 @socketio.on('draw-card')
 def draw_card(data):
     game.draw(data['player'])
     state = game.get_state()
-    emit("state-change", parse_state(state))
+    emit("state-change", parse_game_state(state))
 
 
 @socketio.on('play-card')
 def draw_card(data):
     game.play_card(data['player'], data['card'])
     state = game.get_state()
-    emit("state-change", parse_state(state))
+    emit("state-change", parse_game_state(state))
 
-
-@socketio.on("connect")
-def connected():
-    # print(f"user {request.sid} connected")
-    emit("connect", {"data": f"id: {request.sid} is connected"})
-
-
-@socketio.on("disconnect")
-def disconnected():
-    # print("user disconnected")
-    emit("disconnect", f"user {request.sid} disconnected")
+@socketio.on('connect')
+def connect():
+    return
 
 
 if __name__ == '__main__':
