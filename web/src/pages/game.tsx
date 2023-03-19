@@ -32,6 +32,12 @@ function useSocket() {
     const socket = client.connect();
     setSocket(socket);
 
+    socket.emit('join', { username: 'hello', room: 'what' });
+
+    socket.on('join', data => {
+      console.log(data);
+    });
+
     socket.on('connect', () => {
       setLoading(false);
     });
@@ -98,7 +104,7 @@ function Card(props: any) {
   );
 }
 
-function App() {
+function Game() {
   const { socket, loading } = useSocket();
   const [config, setConfig] = useState({ hand_size: 2 });
   const [hands, setHands] = useState(null);
@@ -216,4 +222,4 @@ function App() {
   );
 }
 
-export default App;
+export default Game;
