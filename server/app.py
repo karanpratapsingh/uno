@@ -30,10 +30,6 @@ def on_join(data):
     player = Player(name, room)
     players = rooms[room]
 
-    if player in players:
-        emit("room", {'players': parse_object_list(list(players))}, to=room)
-        return
-
     players.add(player)
     join_room(room)
     log.info(f"{player} has joined the room {room}")
@@ -48,10 +44,6 @@ def on_leave(data):
     player = Player(name, room)
     players = rooms[room]
 
-    if player not in players:
-        emit("room", {'players': parse_object_list(list(players))}, to=room)
-        return
-
     players.remove(player)
     leave_room(room)
 
@@ -61,7 +53,10 @@ def on_leave(data):
 
 @socketio.on('new-game')
 def new_game(data):
-    game.new(data['hand_size'])
+    hand_size = data['hand_size']
+
+    game.new(hand_size)
+    log.info(f"starting a new game with hand_size: {hand_size}")
     state = game.get_state()
     emit("state-change", parse_game_state(state))
 
@@ -78,6 +73,7 @@ def draw_card(data):
     game.play_card(data['player'], data['card'])
     state = game.get_state()
     emit("state-change", parse_game_state(state))
+
 
 @socketio.on('connect')
 def connect():

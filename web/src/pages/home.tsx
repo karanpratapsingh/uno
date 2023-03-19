@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import StartModal from '../components/modals/start';
-import { GameAction } from '../types';
+import { GameAction } from '../types/game';
+import { Routes } from '../types/routes';
 
 function Home() {
   const navigate = useNavigate();
 
   function onStart(action: GameAction, name: string, room: string) {
-    navigate('/game', { state: { action, name, room } });
+    navigate(Routes.Play, { state: { action, name, room } });
   }
 
   return (

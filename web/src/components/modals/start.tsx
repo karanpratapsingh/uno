@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GameAction } from '../../types';
+import { GameAction } from '../../types/game';
 import Input from '../input';
 
 interface StartModalProps {
