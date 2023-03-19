@@ -18,6 +18,7 @@ import {
 import { HiSquares2X2 } from 'react-icons/hi2';
 
 import { AiOutlinePlus, AiOutlineStop, AiOutlineUndo } from 'react-icons/ai';
+import { useLocation, useNavigation } from 'react-router-dom';
 
 const client = io('localhost:5000/', {
   transports: ['websocket'],
@@ -105,8 +106,10 @@ function Card(props: any) {
 }
 
 function Game() {
+  const { state } = useLocation();
+
   const { socket, loading } = useSocket();
-  const [config, setConfig] = useState({ hand_size: 2 });
+  const [config, setConfig] = useState({ room: state.room, hand_size: 2 });
   const [hands, setHands] = useState(null);
   const [gameStack, setGameStack] = useState<any>([]);
   const [remainingCards, setRemainingCards] = useState<any>([]);

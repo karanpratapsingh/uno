@@ -1,11 +1,11 @@
 class Player:
-    def __init__(self, username, room):
-        self.username = username
+    def __init__(self, name, room):
+        self.name = name
         self.room = room
         self.online = True
 
     def __repr__(self):
-        return f"User(username={self.username})"
+        return f"Player(name={self.username})"
 
     def __hash__(self):
         return hash(self.username)

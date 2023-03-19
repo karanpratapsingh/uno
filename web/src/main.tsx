@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Game from './pages/game';
 import './index.css';
+import Game from './pages/game';
+import Home from './pages/home';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <div>join</div>,
+    element: <Home />,
   },
   {
     path: '/game',
