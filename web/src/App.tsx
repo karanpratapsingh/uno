@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import clsx from 'clsx';
 
 import { io, Socket } from 'socket.io-client';
 import {
@@ -44,14 +45,14 @@ function useSocket() {
 }
 
 function Card(props: any) {
-  const { color, value } = props;
+  const { player, color, value, hidden = false, onClick } = props;
 
   const cardColor: Record<any, string> = {
-    red: 'bg-red-200',
-    blue: 'bg-blue-200',
-    green: 'bg-green-200',
+    red: 'bg-red-400',
+    blue: 'bg-blue-400',
+    green: 'bg-green-400',
     yellow: 'bg-yellow-200',
-    black: 'bg-gray-800',
+    black: 'bg-gray-700',
   };
 
   const cardValue: Record<string, React.ReactNode> = {
@@ -84,21 +85,32 @@ function Card(props: any) {
 
   return (
     <button
-      className={`mr-4 flex h-40 w-32 items-center justify-center rounded ${cardColor[color]}`}
+      onClick={onClick && (() => onClick(player, { color, value }))}
+      className={`mr-4 flex h-40 w-32 items-center justify-center rounded ${clsx(
+        hidden && 'bg-gray-800',
+        !hidden && cardColor[color]
+      )}`}
     >
-      <span className='text-4xl'>{cardValue[value]}</span>
+      <span className='text-3xl'>
+        {hidden ? <span className='text-white'>UNO</span> : cardValue[value]}
+      </span>
     </button>
   );
 }
 
 function App() {
   const { socket, loading } = useSocket();
-  const [config, setConfig] = useState({ players: 2, hand_size: 7 });
-  const [hands, setHands] = useState([]);
+  const [config, setConfig] = useState({ hand_size: 2 });
+  const [hands, setHands] = useState(null);
+  const [gameStack, setGameStack] = useState<any>([]);
+  const [remainingCards, setRemainingCards] = useState<any>([]);
 
   useEffect(() => {
-    socket?.on('new-game', data => {
+    socket?.on('state-change', data => {
+      console.log(data);
       setHands(data.hands);
+      setGameStack(data.game_stack.reverse());
+      setRemainingCards(data.remaining_cards);
     });
   }, [socket]);
 
@@ -131,37 +143,60 @@ function App() {
   }
 
   function Game() {
-    const gameStarted = !!hands.length;
+    function playCard(player: string, card: any) {
+      socket?.emit('play-card', { player, card });
+    }
 
-    const [player1, player2]: any = hands;
+    function drawCard() {
+      socket?.emit('draw-card', { player: 'player_2' });
+    }
+
+    const gameStarted = hands && !!gameStack.length && !!remainingCards.length;
+
+    if (!gameStarted) {
+      return (
+        <div className='flex flex-1 items-center justify-center'>
+          <span className='text-xl italic'>Waiting for game to start...</span>
+        </div>
+      );
+    }
+
+    const { player_1, player_2 }: any = hands;
 
     return (
-      <>
-        {gameStarted ? (
-          <div className='flex flex-1 flex-col justify-center'>
-            {/* Player 2 */}
-            <div className='flex flex-1 items-center justify-center'>
-              {player1.map((card: any) => (
-                <Card {...card} />
+      <div className='flex flex-1 flex-col justify-center'>
+        {/* Player 1 */}
+        <div className='flex flex-1 items-center'>
+          {player_1.map((card: any) => (
+            <Card player={'player_1'} {...card} onClick={playCard} />
+          ))}
+        </div>
+
+        {/* Card space */}
+        <div className='flex flex-1 items-center justify-center'>
+          <div className='flex flex-1'>
+            <div className='stack' onClick={drawCard}>
+              {remainingCards.map((card: any) => (
+                <Card {...card} hidden={true} />
               ))}
             </div>
-
-            {/* Card space */}
-            <div className='flex flex-1 bg-green-100'>CS</div>
-
-            {/* Player 1 */}
-            <div className='flex flex-1 items-center justify-center'>
-              {player2.map((card: any) => (
+          </div>
+          <div className='flex flex-1'>
+            <div className='stack'>
+              {gameStack.map((card: any) => (
                 <Card {...card} />
               ))}
             </div>
           </div>
-        ) : (
-          <div className='flex flex-1 items-center justify-center'>
-            <span>Waiting for game to start...</span>
-          </div>
-        )}
-      </>
+        </div>
+
+        {/* Player 2 */}
+        <div className='flex flex-1 items-center'>
+          {player_2.map((card: any) => (
+            <Card player={'player_2'} {...card} onClick={playCard} />
+          ))}
+        </div>
+      </div>
     );
   }
 
