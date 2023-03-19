@@ -7,3 +7,28 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+.loader {
+  @apply border-4;
+  @apply border-gray-100;
+  @apply border-t-4;
+  @apply border-t-black;
+  @apply h-10;
+  @apply w-10;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

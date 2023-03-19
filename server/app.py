@@ -2,16 +2,20 @@ from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 import json
+from uno import Game
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+game = Game()
 
-@socketio.on('data')
+
+@socketio.on('new-game')
 def handle_message(data):
-    print("data from the front end: ", str(data))
-    emit("data", {'data': data, 'id': request.sid}, broadcast=True)
+    hands = game.new_game(data['players'], data['hand_size'])
+    parsed = [[card.__dict__ for card in hand] for hand in hands]
+    emit("new-game", {'hands': parsed}, broadcast=True)
 
 
 @socketio.on("connect")
