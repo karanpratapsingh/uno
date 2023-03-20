@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import Game from '../components/game';
@@ -7,29 +7,34 @@ import socket from '../lib/socket';
 import { Routes } from '../types/routes';
 
 import { toast } from 'react-toastify';
-import { Player } from '../types/game';
+import { GameAction, GameConfig, Player } from '../types/game';
+import { defaultHandSize, validateGameConfig } from '../lib/state';
 
 function Play() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const isValidState = state && 'name' in state && 'room' in state;
+  const isValidState = state && validateGameConfig(state);
 
   useEffect(() => {
     if (!isValidState) {
       navigate(Routes.Home);
-      // TODO: notify
+      toast.warn('No active game found, please host or join a game');
     }
   }, [isValidState]);
 
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [started, setStarted] = useState(false);
+  const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
+  const [started, setStarted] = useState<boolean>(false);
 
   const [players, setPlayers] = useState<Player[]>([]);
-  const [config, setConfig] = useState({
-    name: state?.name || '',
-    room: state?.room || '',
-    hand_size: 4,
-  });
+  const config = useMemo<GameConfig>(
+    () => ({
+      action: state?.action || GameAction.Join,
+      name: state?.name || '',
+      room: state?.room || '',
+      hand_size: state?.hand_size || defaultHandSize,
+    }),
+    [state]
+  );
 
   useEffect(() => {
     const { name, room } = config;
@@ -74,7 +79,9 @@ function Play() {
     return () => {
       socket.off('connect');
       socket.off('disconnect');
-      // Turn off events
+      socket.off('game::notify');
+      socket.off('game::room');
+      socket.off('game::start');
     };
   }, []);
 
@@ -111,15 +118,16 @@ function Play() {
     content = (
       <div className='flex flex-1 flex-col items-center justify-center'>
         <div>
-          {players.map((player: any) => (
-            <div className='placeholder avatar mr-4'>
-              <div className='w-24 rounded-full bg-neutral-focus text-neutral-content'>
-                <span className='text-3xl'>{player.name}</span>
+          {players.map((player: Player) => (
+            <div className='placeholder avatar mr-4 flex flex-col items-center'>
+              <div className='w-24 rounded-full'>
+                <img src={`https://ui-avatars.com/api/?name=${player.name}`} />
               </div>
+              <span className='mt-2 text-xl'>{player.name}</span>
             </div>
           ))}
         </div>
-        <span className='mt-8 text-xl italic'>{status}</span>
+        <span className='mt-8 text-xl italic text-gray-500'>{status}</span>
       </div>
     );
   }
@@ -131,7 +139,7 @@ function Play() {
         isConnected={isConnected}
         onNewGame={onNewGame}
         onLeave={onLeave}
-        {...config}
+        config={config}
       />
       {isConnected ? (
         content

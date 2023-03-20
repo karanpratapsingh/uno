@@ -13,6 +13,10 @@ body {
   width: 100vw;
 }
 
+.no-pointer {
+  cursor: default;
+}
+
 .loader {
   @apply border-4;
   @apply border-gray-100;

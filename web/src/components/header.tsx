@@ -1,10 +1,10 @@
 import { Socket } from 'socket.io-client';
+import { GameConfig } from '../types/game';
 
 interface HeaderProps {
   socket: Socket;
   isConnected: boolean;
-  name: string;
-  room: string;
+  config: GameConfig;
   onNewGame(): void;
   onLeave(): void;
 }

@@ -1,6 +1,6 @@
 interface InputProps {
   label: string;
-  value: string;
+  value: string | number;
   placeholder?: string;
   disabled?: boolean;
   onChange?(event: React.ChangeEvent<HTMLInputElement>): void;

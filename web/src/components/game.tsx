@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { Player } from '../types/game';
-import Card from './card';
+import { Card, Player } from '../types/game';
+import UnoCard from './card';
 
 interface GameProps {
   currentPlayer: Player;
@@ -24,6 +24,10 @@ function Game(props: GameProps) {
       setGameStack(data.game_stack);
       setRemainingCards(data.remaining_cards);
     });
+
+    return () => {
+      socket.off('game::state');
+    };
   }, []);
 
   function playCard(playerId: string, cardId: string) {
@@ -42,15 +46,21 @@ function Game(props: GameProps) {
   }
 
   const [otherKey] = Object.keys(hands).filter(key => key !== currentPlayer.id);
-  const other = hands[otherKey];
-  const own = hands[currentPlayer.id];
+  const otherCards = hands[otherKey];
+  const ownCards = hands[currentPlayer.id];
 
   return (
     <div className='flex flex-1 flex-col justify-center'>
       {/* Other player */}
       <div className='flex flex-1 items-center'>
-        {other.map((card: any) => (
-          <Card card={card} hidden={true} />
+        {otherCards.map((card: Card) => (
+          <UnoCard
+            key={card.id}
+            currentPlayer={currentPlayer}
+            card={card}
+            hidden
+            disableClick
+          />
         ))}
       </div>
 
@@ -58,15 +68,25 @@ function Game(props: GameProps) {
       <div className='flex flex-1 items-center justify-center'>
         <div className='flex flex-1'>
           <div className='stack' onClick={drawCard}>
-            {remainingCards.map((card: any) => (
-              <Card card={card} hidden={true} />
+            {remainingCards.map((card: Card) => (
+              <UnoCard
+                key={card.id}
+                currentPlayer={currentPlayer}
+                card={card}
+                hidden
+              />
             ))}
           </div>
         </div>
         <div className='flex flex-1'>
           <div className='stack'>
-            {gameStack.map((card: any) => (
-              <Card card={card} />
+            {gameStack.map((card: Card) => (
+              <UnoCard
+                key={card.id}
+                currentPlayer={currentPlayer}
+                card={card}
+                disableClick
+              />
             ))}
           </div>
         </div>
@@ -74,8 +94,12 @@ function Game(props: GameProps) {
 
       {/* Current Player */}
       <div className='flex flex-1 items-center'>
-        {own.map((card: any) => (
-          <Card player={currentPlayer} card={card} onClick={playCard} />
+        {ownCards.map((card: Card) => (
+          <UnoCard
+            currentPlayer={currentPlayer}
+            card={card}
+            onClick={playCard}
+          />
         ))}
       </div>
     </div>

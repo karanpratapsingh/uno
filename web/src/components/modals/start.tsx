@@ -1,23 +1,39 @@
 import { useState } from 'react';
+import { defaultHandSize } from '../../lib/state';
 import { GameAction } from '../../types/game';
 import Input from '../input';
 
 interface StartModalProps {
   action: GameAction;
-  onStart(action: GameAction, name: string, room: string): void;
+  onStart(
+    action: GameAction,
+    name: string,
+    room: string,
+    hand_size?: number
+  ): void;
 }
 
 function StartModal(props: StartModalProps) {
   const { action, onStart } = props;
   const [name, setName] = useState<string>('karan');
   const [room, setRoom] = useState<string>('abcd');
+  const [handSize, setHandSize] = useState<number>(defaultHandSize);
 
-  function onNameChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function onNameChange(event: React.ChangeEvent<HTMLInputElement>): void {
     setName(event.target.value);
   }
 
-  function onRoomChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function onRoomChange(event: React.ChangeEvent<HTMLInputElement>): void {
     setRoom(event.target.value);
+  }
+
+  function onHandSizeChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    setHandSize(Number.parseInt(event.target.value));
+  }
+
+  function onSubmit(): void {
+    // TODO: validate
+    onStart(action, name, room, handSize);
   }
 
   return (
@@ -34,11 +50,18 @@ function StartModal(props: StartModalProps) {
             onChange={onNameChange}
           />
           <Input label='Room' value={room} onChange={onRoomChange} />
+          {action === GameAction.Host && (
+            <Input
+              label='Hand size'
+              value={handSize}
+              onChange={onHandSizeChange}
+            />
+          )}
           <div className='modal-action'>
             <label htmlFor={`${action}-modal`} className='btn-ghost btn'>
               Cancel
             </label>
-            <label className='btn' onClick={() => onStart(action, name, room)}>
+            <label className='btn' onClick={onSubmit}>
               {action}
             </label>
           </div>

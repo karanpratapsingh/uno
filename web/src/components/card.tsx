@@ -13,13 +13,24 @@ import {
   RiNumber8,
   RiNumber9,
 } from 'react-icons/ri';
+import { Card, Player } from '../types/game';
 
-interface CardProps {
-  // TODO
+interface UnoCardProps {
+  currentPlayer: Player;
+  card: Card;
+  hidden?: boolean;
+  disableClick?: boolean;
+  onClick?(playerId: string, cardId: string): void;
 }
 
-function Card(props: any) {
-  const { player, card, hidden = false, onClick } = props;
+function UnoCard(props: UnoCardProps) {
+  const {
+    currentPlayer,
+    card,
+    hidden = false,
+    disableClick = false,
+    onClick,
+  } = props;
 
   const cardColor: Record<any, string> = {
     red: 'bg-red-400',
@@ -59,9 +70,13 @@ function Card(props: any) {
 
   return (
     <button
-      onClick={onClick && (() => onClick(player.id, card.id))}
+      onClick={
+        onClick &&
+        (() => !disableClick && onClick && onClick(currentPlayer.id, card.id))
+      }
       className={`mr-4 flex h-40 w-32 items-center justify-center rounded ${clsx(
         hidden && 'bg-gray-800',
+        disableClick && 'no-pointer',
         !hidden && cardColor[card.color]
       )}`}
     >
@@ -76,4 +91,4 @@ function Card(props: any) {
   );
 }
 
-export default Card;
+export default UnoCard;

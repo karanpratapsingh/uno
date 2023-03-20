@@ -6,7 +6,7 @@ from uno import Game
 import collections
 from player import Player
 import logging
-from parsers import parse_game_state, parse_object_list, parse_notification
+from parsers import parse_game_state, parse_object_list, parse_notification, parse_data_args
 
 import logging
 
@@ -25,6 +25,11 @@ games = collections.defaultdict(Game)
 
 @socketio.on('player::join')
 def on_join(data):
+    valid, missing_args = parse_data_args(data, ['name', 'room'])
+    if not valid:
+        log.error(f'missing args: {", ".join(missing_args)}')
+        return
+
     name, room = data['name'], data['room']
 
     player = Player(name)
@@ -39,6 +44,11 @@ def on_join(data):
 
 @socketio.on('player::leave')
 def on_leave(data):
+    valid, missing_args = parse_data_args(data, ['name', 'room'])
+    if not valid:
+        log.error(f'missing args: {", ".join(missing_args)}')
+        return
+
     name, room = data['name'], data['room']
 
     player = Player(name)
@@ -52,29 +62,42 @@ def on_leave(data):
 
 
 @socketio.on('game::init')
-def new_game(data):
+def on_new_game(data):
+    valid, missing_args = parse_data_args(data, ['room', 'hand_size'])
+    if not valid:
+        log.error(f'missing args: {", ".join(missing_args)}')
+        return
+
     room, hand_size = data['room'], data['hand_size']
 
     game = None
     players = rooms[room]
-    try:
-        game = Game(players, hand_size)
-    except Exception as ex:
-        emit("game::notify", parse_notification('error', ex), to=room)
 
-    if not game:
-        return
+    if room in games:  # Re-join an existing game
+        game = games[room]
+        log.info(f"found an existing game with players {game.players}")
 
-    games[room] = game
-    log.info(f"starting a new game with {players} hand_size: {hand_size}")
+    if not game:  # Start a new game
+        try:
+            game = Game(players, hand_size)
+            games[room] = game
+            log.info(f"starting a new game with {players}")
+        except Exception as ex:
+            emit("game::notify", parse_notification('error', ex), to=room)
+            return
+
     state = game.get_state()
-
     emit("game::start", to=room)
     emit("game::state", parse_game_state(state), to=room)
 
 
 @socketio.on('game::draw')
-def draw_card(data):
+def on_draw_card(data):
+    valid, missing_args = parse_data_args(data, ['room', 'playerId'])
+    if not valid:
+        log.error(f'missing args: {", ".join(missing_args)}')
+        return
+
     room, playerId = data['room'], data['playerId']
 
     game = games[room]
@@ -84,7 +107,12 @@ def draw_card(data):
 
 
 @socketio.on('game::play')
-def draw_card(data):
+def on_play_game(data):
+    valid, missing_args = parse_data_args(data, ['room', 'playerId', 'cardId'])
+    if not valid:
+        log.error(f'missing args: {", ".join(missing_args)}')
+        return
+
     room, playerId, cardId = data['room'], data['playerId'], data['cardId']
 
     game = games[room]

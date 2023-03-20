@@ -1,3 +1,16 @@
+def parse_data_args(data, args):
+    missing_args = []
+
+    for arg in args:
+        if arg not in data:
+            missing_args.append(arg)
+
+    if missing_args != []:
+        return (False, missing_args)
+
+    return (True, missing_args)
+
+
 def parse_notification(notification_type, message):
     return {'type': notification_type, 'message': str(message)}
 

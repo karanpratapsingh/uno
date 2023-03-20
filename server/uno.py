@@ -84,11 +84,17 @@ class Game:
 
     def play_card(self, playerId, cardId):
         player = self.find_object(self.players, playerId)
-
         player_cards = self.hands[player]
         card = self.find_object(player_cards, cardId)
+
+        # Enforce rules
+        # TODO
+
+        # Find and remove card from the current player's hand
         idx = self.find_object_idx(player_cards, card.id)
         player_cards.pop(idx)
+
+        # Insert played card to the game stack
         self.game_stack.insert(0, card)
 
     def find_object(self, objects, id):
