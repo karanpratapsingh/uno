@@ -8,9 +8,11 @@ function Avatar(props: AvatarProps) {
   return (
     <div className='placeholder avatar mr-4 flex flex-col items-center'>
       <div className='w-24 rounded-full'>
-        <img src={`https://ui-avatars.com/api/?name=${name}`} />
+        <img
+          src={`https://ui-avatars.com/api/?name=${name}&background=random`}
+        />
       </div>
-      <span className='mt-2 text-xl'>{name}</span>
+      <span className='mt-2'>{name}</span>
     </div>
   );
 }

@@ -19,7 +19,7 @@ function Header(props: HeaderProps) {
         <InfoMenu config={config} isConnected={isConnected} />
       </div>
       <div className='navbar-center hidden lg:flex'>
-        <span className='text-xl font-bold'>UNO</span>
+        <span className='text-2xl font-bold'>UNO</span>
       </div>
       <div className='navbar-end'>
         <button onClick={onNewGame} className='btn-sm btn mr-2'>
