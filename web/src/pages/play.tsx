@@ -16,7 +16,7 @@ import {
 } from '../types/game';
 import { Routes } from '../types/routes';
 
-function Play() {
+function Play(): React.ReactElement {
   const navigate = useNavigate();
   const { state } = useLocation();
   const isValidState = state && validateGameConfig(state);
@@ -96,12 +96,12 @@ function Play() {
     };
   }, []);
 
-  function onNewGame() {
+  function onNewGame(): void {
     const { room, hand_size } = config;
     socket.emit(Events.GAME_START, { room, hand_size });
   }
 
-  function onLeave() {
+  function onLeave(): void {
     const { name, room } = config;
     socket.emit(Events.PLAYER_LEAVE, { name, room });
     navigate(Routes.Home);

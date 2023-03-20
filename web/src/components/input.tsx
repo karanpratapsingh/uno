@@ -6,7 +6,7 @@ interface InputProps {
   onChange?(event: React.ChangeEvent<HTMLInputElement>): void;
 }
 
-function Input(props: InputProps) {
+function Input(props: InputProps): React.ReactElement {
   const { label, value, placeholder, disabled = false, onChange } = props;
 
   return (

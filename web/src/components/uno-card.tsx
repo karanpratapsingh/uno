@@ -11,7 +11,7 @@ interface UnoCardProps {
   onClick?(playerId: string, cardId: string): void;
 }
 
-function UnoCard(props: UnoCardProps) {
+function UnoCard(props: UnoCardProps): React.ReactElement {
   const {
     currentPlayer,
     card,

@@ -2,7 +2,7 @@ interface AvatarProps {
   name: string;
 }
 
-function Avatar(props: AvatarProps) {
+function Avatar(props: AvatarProps): React.ReactElement {
   const { name } = props;
 
   return (

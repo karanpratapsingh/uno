@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { defaultHandSize, maxHandSize } from '../../lib/state';
+import { defaultHandSize, maxHandSize, minHandSize } from '../../lib/state';
 import { GameAction } from '../../types/game';
 import Input from '../input';
 import shortid from 'shortid';
@@ -15,7 +15,7 @@ interface StartModalProps {
   ): void;
 }
 
-function StartModal(props: StartModalProps) {
+function StartModal(props: StartModalProps): React.ReactElement {
   const { action, onStart } = props;
   const [name, setName] = useState<string>('');
   const [room, setRoom] = useState<string>('');
@@ -60,6 +60,11 @@ function StartModal(props: StartModalProps) {
 
     if (handSize > maxHandSize) {
       toast.error(`hand size should not be greater than ${maxHandSize}`);
+      return;
+    }
+
+    if (handSize < minHandSize) {
+      toast.error(`hand size should not be less than ${maxHandSize}`);
       return;
     }
 

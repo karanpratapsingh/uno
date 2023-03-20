@@ -3,7 +3,7 @@ import StartModal from '../components/modals/start';
 import { GameAction, GameConfig } from '../types/game';
 import { Routes } from '../types/routes';
 
-function Home() {
+function Home(): React.ReactElement {
   const navigate = useNavigate();
 
   function onStart(

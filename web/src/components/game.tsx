@@ -11,7 +11,7 @@ interface GameProps {
   room: string;
 }
 
-function Game(props: GameProps) {
+function Game(props: GameProps): React.ReactElement {
   const { socket, currentPlayer, players, started, room } = props;
 
   const [hands, setHands] = useState<Hands | null>(null);
@@ -44,7 +44,7 @@ function Game(props: GameProps) {
     started && hands && gameStack.length && remainingCards.length;
 
   if (!gameActive) {
-    return null;
+    return <></>;
   }
 
   const [otherPlayer] = players.filter(p => p.id !== currentPlayer.id);

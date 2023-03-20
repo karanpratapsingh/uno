@@ -10,7 +10,7 @@ interface HeaderProps {
   onLeave(): void;
 }
 
-function Header(props: HeaderProps) {
+function Header(props: HeaderProps): React.ReactElement {
   const { isConnected, onNewGame, config, onLeave } = props;
 
   return (

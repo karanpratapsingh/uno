@@ -7,7 +7,7 @@ interface InfoMenuProps {
   config: GameConfig;
 }
 
-function InfoMenu(props: InfoMenuProps) {
+function InfoMenu(props: InfoMenuProps): React.ReactElement {
   const { isConnected, config } = props;
 
   return (
