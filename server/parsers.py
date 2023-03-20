@@ -2,18 +2,15 @@ def parse_notification(notification_type, message):
     return {'type': notification_type, 'message': str(message)}
 
 
-def parse_object_list(objs):
-    return [o.__dict__ for o in list(objs)]
+def parse_object_list(objects):
+    return [obj.__dict__ for obj in list(objects)]
 
 
 def parse_game_state(state):
-
     (hands, remaining_cards, game_stack) = state
+    parsed_hands = {key.id: parse_object_list(
+        value) for key, value in hands.items()}
 
-    parsed_hands = {
-        'player_1': parse_object_list(hands['player_1']),
-        'player_2': parse_object_list(hands['player_2']),
-    }
     parsed_remaining_cards = parse_object_list(remaining_cards)
     parsed_game_stack = parse_object_list(game_stack)
 

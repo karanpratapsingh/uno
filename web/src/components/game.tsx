@@ -1,21 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
+import { Player } from '../types/game';
 import Card from './card';
 
 interface GameProps {
+  currentPlayer: Player;
   socket: Socket;
   started: boolean;
+  room: string;
 }
 
 function Game(props: GameProps) {
-  const { socket, started } = props;
+  const { socket, currentPlayer, started, room } = props;
 
-  const [hands, setHands] = useState(null);
+  const [hands, setHands] = useState<any | null>(null);
   const [gameStack, setGameStack] = useState<any>([]);
   const [remainingCards, setRemainingCards] = useState<any>([]);
 
   useEffect(() => {
-    socket.on('state-change', data => {
+    socket.on('game::state', data => {
+      console.log(data);
       setHands(data.hands);
       setGameStack(data.game_stack);
       setRemainingCards(data.remaining_cards);
@@ -23,11 +27,11 @@ function Game(props: GameProps) {
   }, []);
 
   function playCard(playerId: string, cardId: string) {
-    socket.emit('play-card', { playerId, cardId });
+    socket.emit('game::play', { playerId, cardId, room });
   }
 
   function drawCard() {
-    socket.emit('draw-card', { player: 'player_2' });
+    socket.emit('game::draw', { playerId: currentPlayer.id, room });
   }
 
   const gameActive =
@@ -37,14 +41,16 @@ function Game(props: GameProps) {
     return null;
   }
 
-  const { player_1, player_2 }: any = hands;
+  const [otherKey] = Object.keys(hands).filter(key => key !== currentPlayer.id);
+  const other = hands[otherKey];
+  const own = hands[currentPlayer.id];
 
   return (
     <div className='flex flex-1 flex-col justify-center'>
-      {/* Player 1 */}
+      {/* Other player */}
       <div className='flex flex-1 items-center'>
-        {player_1.map((card: any) => (
-          <Card player={{id:'player_1'}} card={card} onClick={playCard} />
+        {other.map((card: any) => (
+          <Card card={card} hidden={true} />
         ))}
       </div>
 
@@ -66,10 +72,10 @@ function Game(props: GameProps) {
         </div>
       </div>
 
-      {/* Player 2 */}
+      {/* Current Player */}
       <div className='flex flex-1 items-center'>
-        {player_2.map((card: any) => (
-          <Card player={{id:'player_2'}} card={card} onClick={playCard} />
+        {own.map((card: any) => (
+          <Card player={currentPlayer} card={card} onClick={playCard} />
         ))}
       </div>
     </div>

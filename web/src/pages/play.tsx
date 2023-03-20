@@ -7,6 +7,7 @@ import socket from '../lib/socket';
 import { Routes } from '../types/routes';
 
 import { toast } from 'react-toastify';
+import { Player } from '../types/game';
 
 function Play() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ function Play() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [started, setStarted] = useState(false);
 
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [config, setConfig] = useState({
     name: state?.name || '',
     room: state?.room || '',
@@ -32,22 +33,19 @@ function Play() {
 
   useEffect(() => {
     const { name, room } = config;
-    socket.emit('join', { name, room });
+    socket.emit('player::join', { name, room });
   }, [config]);
 
   useEffect(() => {
-    function onConnect(): void {
+    socket.on('connect', () => {
       setIsConnected(true);
-    }
+    });
 
-    function onDisconnect(): void {
+    socket.on('disconnect', () => {
       setIsConnected(false);
-    }
+    });
 
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-
-    socket.on('notify', data => {
+    socket.on('game::notify', data => {
       const { type, message } = data;
       switch (type) {
         case 'info':
@@ -65,7 +63,7 @@ function Play() {
       }
     });
 
-    socket.on('room', data => {
+    socket.on('game::room', data => {
       setPlayers(data.players);
     });
 
@@ -76,8 +74,7 @@ function Play() {
     return () => {
       socket.off('connect');
       socket.off('disconnect');
-      socket.off('room');
-      socket.off('notify');
+      // Turn off events
     };
   }, []);
 
@@ -88,14 +85,22 @@ function Play() {
 
   function onLeave() {
     const { name, room } = config;
-    socket.emit('leave', { name, room });
+    socket.emit('player::leave', { name, room });
     navigate(Routes.Home);
   }
 
   let content: React.ReactNode = null;
+  const currentPlayer = players.find(player => player.name == config.name);
 
-  if (started) {
-    content = <Game socket={socket} started={started} />;
+  if (started && currentPlayer) {
+    content = (
+      <Game
+        socket={socket}
+        started={started}
+        room={config.room}
+        currentPlayer={currentPlayer}
+      />
+    );
   } else {
     let status = 'Waiting for second player to the join...';
 

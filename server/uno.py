@@ -44,7 +44,7 @@ SHUFFLE_FREQ = 10
 class Game:
     def __init__(self, players, hand_size):
         self.hands = collections.defaultdict(list)
-        self.players = players
+        self.players = list(players)
 
         if len(self.players) < 2:
             raise Exception("Cannot start the game without atleast 2 players")
@@ -86,9 +86,10 @@ class Game:
         player = self.find_object(self.players, playerId)
 
         player_cards = self.hands[player]
-        idx = self.find_object_idx(player_cards, cardId)
+        card = self.find_object(player_cards, cardId)
+        idx = self.find_object_idx(player_cards, card.id)
         player_cards.pop(idx)
-        self.game_stack.insert(0, self.game_stack)
+        self.game_stack.insert(0, card)
 
     def find_object(self, objects, id):
         idx = self.find_object_idx(objects, id)
