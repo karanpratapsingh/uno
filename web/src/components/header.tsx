@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io-client';
 import { GameConfig } from '../types/game';
+import InfoMenu from './menus/info';
 
 interface HeaderProps {
   socket: Socket;
@@ -10,18 +11,12 @@ interface HeaderProps {
 }
 
 function Header(props: HeaderProps) {
-  const { isConnected, onNewGame, onLeave } = props;
+  const { isConnected, onNewGame, config, onLeave } = props;
 
   return (
     <div className='navbar bg-base-100'>
       <div className='navbar-start'>
-        <div>
-          {isConnected ? (
-            <div className='h-4 w-4 rounded bg-green-400' />
-          ) : (
-            <div className='h-4 w-4 rounded bg-red-400' />
-          )}
-        </div>
+        <InfoMenu config={config} isConnected={isConnected} />
       </div>
       <div className='navbar-center hidden lg:flex'>
         <span className='text-xl font-bold'>UNO</span>
@@ -30,7 +25,7 @@ function Header(props: HeaderProps) {
         <button onClick={onNewGame} className='btn-sm btn mr-2'>
           New Game
         </button>
-        <button className='btn-ghost btn-sm btn' onClick={onLeave}>
+        <button className='btn-ghost btn-sm btn text-red-400' onClick={onLeave}>
           Leave
         </button>
       </div>

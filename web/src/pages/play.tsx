@@ -9,6 +9,7 @@ import { Routes } from '../types/routes';
 import { toast } from 'react-toastify';
 import { GameAction, GameConfig, Player } from '../types/game';
 import { defaultHandSize, validateGameConfig } from '../lib/state';
+import Avatar from '../components/avatar';
 
 function Play() {
   const navigate = useNavigate();
@@ -102,6 +103,7 @@ function Play() {
   if (started && currentPlayer) {
     content = (
       <Game
+        players={players}
         socket={socket}
         started={started}
         room={config.room}
@@ -117,14 +119,9 @@ function Play() {
 
     content = (
       <div className='flex flex-1 flex-col items-center justify-center'>
-        <div>
+        <div className='flex'>
           {players.map((player: Player) => (
-            <div className='placeholder avatar mr-4 flex flex-col items-center'>
-              <div className='w-24 rounded-full'>
-                <img src={`https://ui-avatars.com/api/?name=${player.name}`} />
-              </div>
-              <span className='mt-2 text-xl'>{player.name}</span>
-            </div>
+            <Avatar key={player.id} name={player.name} />
           ))}
         </div>
         <span className='mt-8 text-xl italic text-gray-500'>{status}</span>

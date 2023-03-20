@@ -44,7 +44,7 @@ function StartModal(props: StartModalProps) {
 
   function onSubmit(): void {
     if (name === '') {
-      toast.error('name should be blank');
+      toast.error('name should not be blank');
       return;
     }
 
@@ -53,7 +53,10 @@ function StartModal(props: StartModalProps) {
       return;
     }
 
-    // TODO: generate room shortid
+    if (room === '') {
+      toast.error('room id should not be empty');
+      return;
+    }
 
     if (handSize > maxHandSize) {
       toast.error(`hand size should not be greater than ${maxHandSize}`);
@@ -73,13 +76,14 @@ function StartModal(props: StartModalProps) {
           <Input
             label='Enter a name'
             value={name}
-            placeholder='eg. abcd'
+            placeholder='eg. kps99'
             onChange={onNameChange}
           />
           <Input
             label='Room'
             value={room}
             disabled={action === GameAction.Host}
+            placeholder='eg. abcd'
             onChange={onRoomChange}
           />
           {action === GameAction.Host && (

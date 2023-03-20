@@ -5,13 +5,14 @@ import UnoCard from './card';
 
 interface GameProps {
   currentPlayer: Player;
+  players: Player[];
   socket: Socket;
   started: boolean;
   room: string;
 }
 
 function Game(props: GameProps) {
-  const { socket, currentPlayer, started, room } = props;
+  const { socket, currentPlayer, players, started, room } = props;
 
   const [hands, setHands] = useState<any | null>(null);
   const [gameStack, setGameStack] = useState<any>([]);
@@ -19,7 +20,6 @@ function Game(props: GameProps) {
 
   useEffect(() => {
     socket.on('game::state', data => {
-      console.log(data);
       setHands(data.hands);
       setGameStack(data.game_stack);
       setRemainingCards(data.remaining_cards);
@@ -45,23 +45,27 @@ function Game(props: GameProps) {
     return null;
   }
 
-  const [otherKey] = Object.keys(hands).filter(key => key !== currentPlayer.id);
-  const otherCards = hands[otherKey];
+  const [otherPlayer] = players.filter(p => p.id !== currentPlayer.id);
+  const otherCards = hands[otherPlayer.id];
+
   const ownCards = hands[currentPlayer.id];
 
   return (
     <div className='flex flex-1 flex-col justify-center'>
       {/* Other player */}
-      <div className='flex flex-1 items-center'>
-        {otherCards.map((card: Card) => (
-          <UnoCard
-            key={card.id}
-            currentPlayer={currentPlayer}
-            card={card}
-            hidden
-            disableClick
-          />
-        ))}
+      <div className='mt-4 flex flex-col'>
+        <span className='mb-4 text-center'>{otherPlayer.name}</span>
+        <div className='flex items-center'>
+          {otherCards.map((card: Card) => (
+            <UnoCard
+              key={card.id}
+              currentPlayer={currentPlayer}
+              card={card}
+              hidden
+              disableClick
+            />
+          ))}
+        </div>
       </div>
 
       {/* Card space */}
@@ -93,14 +97,17 @@ function Game(props: GameProps) {
       </div>
 
       {/* Current Player */}
-      <div className='flex flex-1 items-center'>
-        {ownCards.map((card: Card) => (
-          <UnoCard
-            currentPlayer={currentPlayer}
-            card={card}
-            onClick={playCard}
-          />
-        ))}
+      <div className='flex flex-col'>
+        <div className='flex items-center'>
+          {ownCards.map((card: Card) => (
+            <UnoCard
+              currentPlayer={currentPlayer}
+              card={card}
+              onClick={playCard}
+            />
+          ))}
+        </div>
+        <span className='mt-4 text-center'>{currentPlayer.name}</span>
       </div>
     </div>
   );
