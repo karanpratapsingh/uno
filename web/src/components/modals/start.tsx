@@ -38,8 +38,13 @@ function StartModal(props: StartModalProps): React.ReactElement {
   }
 
   function onHandSizeChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    const { value } = event.target;
-    setHandSize(Number.parseInt(value));
+    const value = Number.parseInt(event.target.value);
+
+    if (Number.isNaN(value)) {
+      setHandSize(0);
+    } else {
+      setHandSize(value);
+    }
   }
 
   function onSubmit(): void {
@@ -64,7 +69,7 @@ function StartModal(props: StartModalProps): React.ReactElement {
     }
 
     if (handSize < minHandSize) {
-      toast.error(`hand size should not be less than ${maxHandSize}`);
+      toast.error(`hand size should not be less than ${minHandSize}`);
       return;
     }
 
