@@ -47,7 +47,7 @@ class Game:
         self.players = list(players)
 
         if len(self.players) < 2:
-            raise Exception("Cannot start the game without atleast 2 players")
+            raise Exception("cannot start the game, need at least 2 players")
 
         # Shuffle deck
         deck = DECK[::]

@@ -83,7 +83,7 @@ def on_new_game(data):
             games[room] = game
             log.info(f"starting a new game with {players}")
         except Exception as ex:
-            emit("game::notify", parse_notification('error', ex), to=room)
+            emit("game::notify", parse_notification('warn', ex), to=room)
             return
 
     state = game.get_state()
