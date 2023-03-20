@@ -25,7 +25,7 @@ body {
   @apply h-10;
   @apply w-10;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {

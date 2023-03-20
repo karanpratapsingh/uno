@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import { Card, Player } from '../types/game';
+import { Card, Events, Player } from '../types/game';
 import UnoCard from './uno-card';
 
 interface GameProps {
@@ -19,23 +19,23 @@ function Game(props: GameProps) {
   const [remainingCards, setRemainingCards] = useState<any>([]);
 
   useEffect(() => {
-    socket.on('game::state', data => {
+    socket.on(Events.GAME_STATE, data => {
       setHands(data.hands);
       setGameStack(data.game_stack);
       setRemainingCards(data.remaining_cards);
     });
 
     return () => {
-      socket.off('game::state');
+      socket.off(Events.GAME_STATE);
     };
   }, []);
 
-  function playCard(playerId: string, cardId: string) {
-    socket.emit('game::play', { playerId, cardId, room });
+  function playCard(playerId: string, cardId: string): void {
+    socket.emit(Events.GAME_PLAY, { playerId, cardId, room });
   }
 
-  function drawCard() {
-    socket.emit('game::draw', { playerId: currentPlayer.id, room });
+  function drawCard(): void {
+    socket.emit(Events.GAME_DRAW, { playerId: currentPlayer.id, room });
   }
 
   const gameActive =

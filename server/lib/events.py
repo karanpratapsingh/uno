@@ -1,0 +1,8 @@
+GAME_ROOM = "game::room"
+GAME_START = "game::start"
+GAME_STATE = "game::state"
+GAME_NOTIFY = "game::notify"
+GAME_PLAY = "game::play"
+GAME_DRAW = "game::draw"
+PLAYER_JOIN = "player::join"
+PLAYER_LEAVE = "player::leave"

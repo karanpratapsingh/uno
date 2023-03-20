@@ -1,3 +1,4 @@
+from lib.notification import Notification
 import random
 import json
 import collections
@@ -6,12 +7,12 @@ import logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-COLORS = ['red', 'blue', 'green', 'yellow'] # TODO: make this enum
+COLORS = ['red', 'blue', 'green', 'yellow']
 NUMBER_CARDS = [str(i) for i in (list(range(0, 10)) + list(range(1, 10)))]
-PLUS_2_CARDS = ['+2'] * 2
+PLUS_2_CARDS = ['draw-two'] * 2
 REVERSE_CARDS = ['reverse'] * 2
 SKIP_CARDS = ['skip'] * 2
-DRAW_CARDS = ['+4', 'wild']
+DRAW_CARDS = ['draw-four', 'wild']
 COLOR_CARDS = NUMBER_CARDS + PLUS_2_CARDS + REVERSE_CARDS + SKIP_CARDS
 
 
@@ -37,7 +38,7 @@ class Card:
         self.color = color
         self.value = value
 
-    def isSpecial(self):
+    def is_special(self):
         special_cards = set(PLUS_2_CARDS + REVERSE_CARDS +
                             SKIP_CARDS + DRAW_CARDS)
         return self.value in special_cards or self.color == 'black'
@@ -53,12 +54,14 @@ DECK = [Card(color, value)
 
 
 class Game:
-    def __init__(self, players, hand_size):
+    def __init__(self, room,  players, hand_size):
         self.hands = collections.defaultdict(list)
         self.players = list(players)
+        self.notify = Notification(room)
 
         if len(self.players) < 2:
             raise Exception("need at least 2 players to start the game")
+            return
 
         # Shuffle deck
         deck = DECK[::]
@@ -69,16 +72,16 @@ class Game:
         self.remaining_cards = deck[(TOTAL_PLAYERS * hand_size) + 1:]
         player_cards = deck[:TOTAL_PLAYERS * hand_size]
 
-        # Distribute cards
+        # Distribute cards (alternatively)
         i = 0
         while i < len(player_cards):
             for player in players:
                 self.hands[player].append(player_cards[i])
                 i += 1
 
-        # Pick top card
+        # Pick a top card (skip special cards)
         top_card = random.choice(self.remaining_cards)
-        while top_card.isSpecial():
+        while top_card.is_special():
             top_card = random.choice(self.remaining_cards)
 
         self.game_stack = [top_card]
@@ -93,12 +96,13 @@ class Game:
         new_card = self.remaining_cards.pop()
         player_cards.append(new_card)
 
-    def play_card(self, playerId, cardId):
+    def play(self, playerId, cardId):
         player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
         card = self.find_object(player_cards, cardId)
 
         # TODO: Enforce rules
+        
 
         # Find and remove card from the current player's hand
         idx = self.find_object_idx(player_cards, card.id)

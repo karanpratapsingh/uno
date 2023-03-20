@@ -5,8 +5,9 @@ import json
 from uno import Game, Player
 import collections
 import logging
-from lib.parsers import parse_game_state, parse_object_list, parse_notification, parse_data_args
-
+from lib.notification import Notification
+from lib.parsers import parse_game_state, parse_object_list, parse_data_args
+import lib.events as events
 import logging
 
 log = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ rooms = collections.defaultdict(set)
 games = collections.defaultdict(Game)
 
 
-@socketio.on('player::join')
+@socketio.on(events.PLAYER_JOIN)
 def on_join(data):
     valid, missing_args = parse_data_args(data, ['name', 'room'])
     if not valid:
@@ -39,11 +40,13 @@ def on_join(data):
     join_room(room)
 
     log.info(f"{player} has joined the room {room}")
-    emit("game::room", {'players': parse_object_list(players)}, to=room)
+    emit(events.GAME_ROOM, {
+         'players': parse_object_list(players)}, to=room)
 
 
-@socketio.on('player::leave')
+@socketio.on(events.PLAYER_LEAVE)
 def on_leave(data):
+    # Throw error or something
     valid, missing_args = parse_data_args(data, ['name', 'room'])
     if not valid:
         log.error(f'missing args: {", ".join(missing_args)}')
@@ -58,10 +61,10 @@ def on_leave(data):
     leave_room(room)
 
     log.info(f"{player} has left the room {room}")
-    emit("game::room", {'players': parse_object_list(players)}, to=room)
+    emit(events.GAME_ROOM, {'players': parse_object_list(players)}, to=room)
 
 
-@socketio.on('game::init')
+@socketio.on(events.GAME_START)
 def on_new_game(data):
     valid, missing_args = parse_data_args(data, ['room', 'hand_size'])
     if not valid:
@@ -79,19 +82,19 @@ def on_new_game(data):
 
     if not game:  # Start a new game
         try:
-            game = Game(players, hand_size)
+            game = Game(room, players, hand_size)
             games[room] = game
             log.info(f"starting a new game with {players}")
         except Exception as ex:
-            emit("game::notify", parse_notification('warn', ex), to=room)
+            Notification(room).error(ex)
             return
 
     state = game.get_state()
-    emit("game::start", to=room)
-    emit("game::state", parse_game_state(state), to=room)
+    emit(events.GAME_START, to=room)
+    emit(events.GAME_STATE, parse_game_state(state), to=room)
 
 
-@socketio.on('game::draw')
+@socketio.on(events.GAME_DRAW)
 def on_draw_card(data):
     valid, missing_args = parse_data_args(data, ['room', 'playerId'])
     if not valid:
@@ -103,10 +106,10 @@ def on_draw_card(data):
     game = games[room]
     game.draw(playerId)
     state = game.get_state()
-    emit("game::state", parse_game_state(state), to=room)
+    emit(events.GAME_STATE, parse_game_state(state), to=room)
 
 
-@socketio.on('game::play')
+@socketio.on(events.GAME_PLAY)
 def on_play_game(data):
     valid, missing_args = parse_data_args(data, ['room', 'playerId', 'cardId'])
     if not valid:
@@ -116,9 +119,9 @@ def on_play_game(data):
     room, playerId, cardId = data['room'], data['playerId'], data['cardId']
 
     game = games[room]
-    game.play_card(playerId, cardId)
+    game.play(playerId, cardId)
     state = game.get_state()
-    emit("game::state", parse_game_state(state), to=room)
+    emit(events.GAME_STATE, parse_game_state(state), to=room)
 
 
 if __name__ == '__main__':

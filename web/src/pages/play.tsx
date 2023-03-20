@@ -7,7 +7,7 @@ import socket from '../lib/socket';
 import { Routes } from '../types/routes';
 
 import { toast } from 'react-toastify';
-import { GameAction, GameConfig, Player } from '../types/game';
+import { Events, GameAction, GameConfig, Player } from '../types/game';
 import { defaultHandSize, validateGameConfig } from '../lib/state';
 import Avatar from '../components/avatar';
 
@@ -39,7 +39,7 @@ function Play() {
 
   useEffect(() => {
     const { name, room } = config;
-    socket.emit('player::join', { name, room });
+    socket.emit(Events.PLAYER_JOIN, { name, room });
   }, [config]);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ function Play() {
       setIsConnected(false);
     });
 
-    socket.on('game::notify', data => {
+    socket.on(Events.GAME_NOTIFY, data => {
       const { type, message } = data;
       switch (type) {
         case 'info':
@@ -69,11 +69,11 @@ function Play() {
       }
     });
 
-    socket.on('game::room', data => {
+    socket.on(Events.GAME_ROOM, data => {
       setPlayers(data.players);
     });
 
-    socket.on('game::start', () => {
+    socket.on(Events.GAME_START, () => {
       setStarted(true);
     });
 
@@ -88,12 +88,12 @@ function Play() {
 
   function onNewGame() {
     const { room, hand_size } = config;
-    socket.emit('game::init', { room, hand_size });
+    socket.emit(Events.GAME_START, { room, hand_size });
   }
 
   function onLeave() {
     const { name, room } = config;
-    socket.emit('player::leave', { name, room });
+    socket.emit(Events.PLAYER_LEAVE, { name, room });
     navigate(Routes.Home);
   }
 
@@ -141,8 +141,11 @@ function Play() {
       {isConnected ? (
         content
       ) : (
-        <div className='flex flex-1 items-center justify-center'>
+        <div className='flex flex-1 flex-col items-center justify-center'>
           <div className='loader' />
+          <span className='mt-8 text-center text-xl italic text-gray-500'>
+            connecting...
+          </span>
         </div>
       )}
     </div>
