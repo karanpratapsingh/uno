@@ -26,8 +26,7 @@ function UnoCard(props: UnoCardProps) {
   return (
     <button
       onClick={() => allowPlay && onClick(currentPlayer.id, card.id)}
-      className={`mr-4 flex h-40 w-32 items-center justify-center rounded ${clsx(
-        hidden && 'bg-gray-800',
+      className={`mr-4 flex h-48 items-center justify-center rounded ${clsx(
         disableClick && 'no-pointer'
       )}`}
     >
