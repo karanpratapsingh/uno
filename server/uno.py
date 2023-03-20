@@ -19,6 +19,7 @@ DRAW_CARDS = ['+4', 'wild']
 COLOR_CARDS = NUMBER_CARDS + PLUS_2_CARDS + REVERSE_CARDS + SKIP_CARDS
 
 
+# TODO: separate module
 class Card:
     def __init__(self, color, value):
         self.id = f'{value}-{color}'
@@ -47,7 +48,7 @@ class Game:
         self.players = list(players)
 
         if len(self.players) < 2:
-            raise Exception("cannot start the game, need at least 2 players")
+            raise Exception("need at least 2 players to start the game")
 
         # Shuffle deck
         deck = DECK[::]
@@ -87,14 +88,13 @@ class Game:
         player_cards = self.hands[player]
         card = self.find_object(player_cards, cardId)
 
-        # Enforce rules
-        # TODO
+        # TODO: Enforce rules
 
         # Find and remove card from the current player's hand
         idx = self.find_object_idx(player_cards, card.id)
         player_cards.pop(idx)
 
-        # Insert played card to the game stack
+        # Insert played card top of the game stack
         self.game_stack.insert(0, card)
 
     def find_object(self, objects, id):
