@@ -2,7 +2,7 @@ export type GameConfig = {
   action: GameAction;
   name: string;
   room: string;
-  hand_size?: number;
+  hand_size: number;
 };
 
 export enum GameAction {

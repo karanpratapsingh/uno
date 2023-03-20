@@ -109,7 +109,7 @@ function Play() {
       />
     );
   } else {
-    let status = 'Waiting for second player to the join...';
+    let status = 'Waiting for other players to the join...';
 
     if (players.length > 1) {
       status = 'Waiting for the game to start...';

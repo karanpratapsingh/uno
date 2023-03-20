@@ -10,7 +10,7 @@ function Home() {
     action: GameAction,
     name: string,
     room: string,
-    hand_size?: number
+    hand_size: number
   ) {
     navigate(Routes.Play, {
       state: { action, name, room, hand_size } as GameConfig,

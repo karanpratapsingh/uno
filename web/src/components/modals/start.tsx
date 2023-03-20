@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { defaultHandSize } from '../../lib/state';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { defaultHandSize, maxHandSize } from '../../lib/state';
 import { GameAction } from '../../types/game';
 import Input from '../input';
+import shortid from 'shortid';
 
 interface StartModalProps {
   action: GameAction;
@@ -9,30 +11,55 @@ interface StartModalProps {
     action: GameAction,
     name: string,
     room: string,
-    hand_size?: number
+    hand_size: number
   ): void;
 }
 
 function StartModal(props: StartModalProps) {
   const { action, onStart } = props;
-  const [name, setName] = useState<string>('karan');
-  const [room, setRoom] = useState<string>('abcd');
+  const [name, setName] = useState<string>('');
+  const [room, setRoom] = useState<string>('');
   const [handSize, setHandSize] = useState<number>(defaultHandSize);
 
+  useEffect(() => {
+    if (action === GameAction.Host) {
+      setRoom(shortid.generate());
+    }
+  }, [action]);
+
   function onNameChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    setName(event.target.value);
+    const { value } = event.target;
+    setName(value);
   }
 
   function onRoomChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    setRoom(event.target.value);
+    const { value } = event.target;
+    setRoom(value);
   }
 
   function onHandSizeChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    setHandSize(Number.parseInt(event.target.value));
+    const { value } = event.target;
+    setHandSize(Number.parseInt(value));
   }
 
   function onSubmit(): void {
-    // TODO: validate
+    if (name === '') {
+      toast.error('name should be blank');
+      return;
+    }
+
+    if (name.includes(' ')) {
+      toast.error('name should not contain blank spaces');
+      return;
+    }
+
+    // TODO: generate room shortid
+
+    if (handSize > maxHandSize) {
+      toast.error(`hand size should not be greater than ${maxHandSize}`);
+      return;
+    }
+
     onStart(action, name, room, handSize);
   }
 
@@ -49,7 +76,12 @@ function StartModal(props: StartModalProps) {
             placeholder='eg. abcd'
             onChange={onNameChange}
           />
-          <Input label='Room' value={room} onChange={onRoomChange} />
+          <Input
+            label='Room'
+            value={room}
+            disabled={action === GameAction.Host}
+            onChange={onRoomChange}
+          />
           {action === GameAction.Host && (
             <Input
               label='Hand size'
