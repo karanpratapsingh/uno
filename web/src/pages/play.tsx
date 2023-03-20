@@ -96,7 +96,7 @@ function Play(): React.ReactElement {
     };
   }, []);
 
-  function onNewGame(): void {
+  function onStartGame(): void {
     const { room, hand_size } = config;
     socket.emit(Events.GAME_START, { room, hand_size });
   }
@@ -134,7 +134,10 @@ function Play(): React.ReactElement {
             <Avatar key={player.id} name={player.name} />
           ))}
         </div>
-        <span className='mt-8 text-xl italic text-gray-500'>{status}</span>
+        <span className='mt-6 text-xl italic text-gray-500'>{status}</span>
+        <button onClick={onStartGame} className='btn-wide btn mt-8'>
+          Start
+        </button>
       </div>
     );
   }
@@ -144,7 +147,6 @@ function Play(): React.ReactElement {
       <Header
         socket={socket}
         isConnected={isConnected}
-        onNewGame={onNewGame}
         onLeave={onLeave}
         config={config}
       />
