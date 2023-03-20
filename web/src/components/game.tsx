@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { Card, Player } from '../types/game';
-import UnoCard from './card';
+import UnoCard from './uno-card';
 
 interface GameProps {
   currentPlayer: Player;
@@ -53,8 +53,8 @@ function Game(props: GameProps) {
   return (
     <div className='flex flex-1 flex-col justify-center'>
       {/* Other player */}
-      <div className='mt-4 flex flex-col'>
-        <span className='mb-4 text-center'>{otherPlayer.name}</span>
+      <div className='flex flex-col'>
+        <span className='my-4 text-center'>{otherPlayer.name}</span>
         <div className='flex items-center'>
           {otherCards.map((card: Card) => (
             <UnoCard
@@ -107,7 +107,7 @@ function Game(props: GameProps) {
             />
           ))}
         </div>
-        <span className='mt-4 text-center'>{currentPlayer.name}</span>
+        <span className='my-4 text-center'>{currentPlayer.name}</span>
       </div>
     </div>
   );
