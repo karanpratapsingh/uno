@@ -1,25 +1,36 @@
 import random
 import json
 import collections
-from player import Player
 import logging
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-COLORS = ['red', 'blue', 'green', 'yellow']
-
+COLORS = ['red', 'blue', 'green', 'yellow'] # TODO: make this enum
 NUMBER_CARDS = [str(i) for i in (list(range(0, 10)) + list(range(1, 10)))]
 PLUS_2_CARDS = ['+2'] * 2
 REVERSE_CARDS = ['reverse'] * 2
 SKIP_CARDS = ['skip'] * 2
-
 DRAW_CARDS = ['+4', 'wild']
-
 COLOR_CARDS = NUMBER_CARDS + PLUS_2_CARDS + REVERSE_CARDS + SKIP_CARDS
 
 
-# TODO: separate module
+class Player:
+    def __init__(self, name):
+        self.id = f'player-{name}'
+        self.name = name
+        self.online = True
+
+    def __repr__(self):
+        return f"Player(id={self.id}, name={self.name})"
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, obj):
+        return isinstance(obj, type(self)) and self.id == obj.id
+
+
 class Card:
     def __init__(self, color, value):
         self.id = f'{value}-{color}'
@@ -35,11 +46,10 @@ class Card:
         return f'Card(color={self.color}, value={self.value})'
 
 
+SHUFFLE_FREQ = 10
+
 DECK = [Card(color, value)
         for color in COLORS for value in COLOR_CARDS] + ([Card('black', value) for value in DRAW_CARDS] * 4)
-
-
-SHUFFLE_FREQ = 10
 
 
 class Game:

@@ -2,11 +2,10 @@ from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from flask_cors import CORS
 import json
-from uno import Game
+from uno import Game, Player
 import collections
-from player import Player
 import logging
-from parsers import parse_game_state, parse_object_list, parse_notification, parse_data_args
+from lib.parsers import parse_game_state, parse_object_list, parse_notification, parse_data_args
 
 import logging
 
@@ -36,6 +35,7 @@ def on_join(data):
     players = rooms[room]
 
     players.add(player)
+    players.add(Player("developer"))  # For development
     join_room(room)
 
     log.info(f"{player} has joined the room {room}")
