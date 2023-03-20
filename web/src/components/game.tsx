@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import { Card, Events, Player } from '../types/game';
+import { Card, Events, GameStatePayload, Hands, Player } from '../types/game';
 import UnoCard from './uno-card';
 
 interface GameProps {
@@ -14,19 +14,21 @@ interface GameProps {
 function Game(props: GameProps) {
   const { socket, currentPlayer, players, started, room } = props;
 
-  const [hands, setHands] = useState<any | null>(null);
-  const [gameStack, setGameStack] = useState<any>([]);
-  const [remainingCards, setRemainingCards] = useState<any>([]);
+  const [hands, setHands] = useState<Hands | null>(null);
+  const [gameStack, setGameStack] = useState<Card[]>([]);
+  const [remainingCards, setRemainingCards] = useState<Card[]>([]);
 
   useEffect(() => {
-    socket.on(Events.GAME_STATE, data => {
+    function onGameState(data: GameStatePayload): void {
       setHands(data.hands);
       setGameStack(data.game_stack);
       setRemainingCards(data.remaining_cards);
-    });
+    }
+
+    socket.on(Events.GAME_STATE, onGameState);
 
     return () => {
-      socket.off(Events.GAME_STATE);
+      socket.off(Events.GAME_STATE, onGameState);
     };
   }, []);
 

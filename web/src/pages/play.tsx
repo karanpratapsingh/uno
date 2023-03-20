@@ -1,15 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
-
 import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Avatar from '../components/avatar';
 import Game from '../components/game';
 import Header from '../components/header';
 import socket from '../lib/socket';
-import { Routes } from '../types/routes';
-
-import { toast } from 'react-toastify';
-import { Events, GameAction, GameConfig, Player } from '../types/game';
 import { defaultHandSize, validateGameConfig } from '../lib/state';
-import Avatar from '../components/avatar';
+import {
+  Events,
+  GameAction,
+  GameConfig,
+  GameNotifyPaylod,
+  GameRoomPaylod,
+  Player,
+} from '../types/game';
+import { Routes } from '../types/routes';
 
 function Play() {
   const navigate = useNavigate();
@@ -43,15 +48,17 @@ function Play() {
   }, [config]);
 
   useEffect(() => {
-    socket.on('connect', () => {
+    function onConnect(): void {
       setIsConnected(true);
-    });
+    }
+    socket.on('connect', onConnect);
 
-    socket.on('disconnect', () => {
+    function onDisconnect(): void {
       setIsConnected(false);
-    });
+    }
+    socket.on('disconnect', onDisconnect);
 
-    socket.on(Events.GAME_NOTIFY, data => {
+    function onGameNotify(data: GameNotifyPaylod): void {
       const { type, message } = data;
       switch (type) {
         case 'info':
@@ -67,22 +74,25 @@ function Play() {
           toast.error(message);
           break;
       }
-    });
+    }
+    socket.on(Events.GAME_NOTIFY, onGameNotify);
 
-    socket.on(Events.GAME_ROOM, data => {
+    function onGameRoom(data: GameRoomPaylod): void {
       setPlayers(data.players);
-    });
+    }
+    socket.on(Events.GAME_ROOM, onGameRoom);
 
-    socket.on(Events.GAME_START, () => {
+    function onGameStart(): void {
       setStarted(true);
-    });
+    }
+    socket.on(Events.GAME_START, onGameStart);
 
     return () => {
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('game::notify');
-      socket.off('game::room');
-      socket.off('game::start');
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off(Events.GAME_NOTIFY, onGameNotify);
+      socket.off(Events.GAME_ROOM, onGameRoom);
+      socket.off(Events.GAME_START, onGameStart);
     };
   }, []);
 
