@@ -14,11 +14,12 @@ import {
   RiNumber9,
 } from 'react-icons/ri';
 
-interface CardProps { // TODO
+interface CardProps {
+  // TODO
 }
 
 function Card(props: any) {
-  const { player, color, value, hidden = false, onClick } = props;
+  const { player, card, hidden = false, onClick } = props;
 
   const cardColor: Record<any, string> = {
     red: 'bg-red-400',
@@ -58,14 +59,18 @@ function Card(props: any) {
 
   return (
     <button
-      onClick={onClick && (() => onClick(player, { color, value }))}
+      onClick={onClick && (() => onClick(player.id, card.id))}
       className={`mr-4 flex h-40 w-32 items-center justify-center rounded ${clsx(
         hidden && 'bg-gray-800',
-        !hidden && cardColor[color]
+        !hidden && cardColor[card.color]
       )}`}
     >
       <span className='text-3xl'>
-        {hidden ? <span className='text-white'>UNO</span> : cardValue[value]}
+        {hidden ? (
+          <span className='text-white'>UNO</span>
+        ) : (
+          cardValue[card.value]
+        )}
       </span>
     </button>
   );

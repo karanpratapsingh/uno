@@ -6,7 +6,9 @@ from uno import Game
 import collections
 from player import Player
 import logging
-from parsers import parse_game_state, parse_object_list
+from parsers import parse_game_state, parse_object_list, parse_notification
+
+import logging
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -17,67 +19,77 @@ app.logger.setLevel(logging.DEBUG)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-game = Game()
-
 rooms = collections.defaultdict(set)
+games = collections.defaultdict(Game)
 
 
 @socketio.on('join')
 def on_join(data):
-    name = data['name']
-    room = data['room']
+    name, room = data['name'], data['room']
 
-    player = Player(name, room)
+    player = Player(name)
     players = rooms[room]
 
     players.add(player)
     join_room(room)
     log.info(f"{player} has joined the room {room}")
-    emit("room", {'players': parse_object_list(list(players))}, to=room)
+    emit("room", {'players': parse_object_list(players)}, to=room)
 
 
 @socketio.on('leave')
 def on_leave(data):
-    name = data['name']
-    room = data['room']
+    name, room = data['name'], data['room']
 
-    player = Player(name, room)
+    player = Player(name)
     players = rooms[room]
 
     players.remove(player)
     leave_room(room)
 
     log.info(f"{player} has left the room {room}")
-    emit("room", {'players': parse_object_list(list(players))}, to=room)
+    emit("room", {'players': parse_object_list(players)}, to=room)
 
 
-@socketio.on('new-game')
+@socketio.on('game::init')
 def new_game(data):
-    hand_size = data['hand_size']
+    room, hand_size = data['room'], data['hand_size']
 
-    game.new(hand_size)
-    log.info(f"starting a new game with hand_size: {hand_size}")
+    game = None
+    players = rooms[room]
+    try:
+        game = Game(players, hand_size)
+    except Exception as ex:
+        emit("notify", parse_notification('error', ex))
+
+    if not game:
+        return
+
+    games[room] = game
+    log.info(f"starting a new game with {players} hand_size: {hand_size}")
     state = game.get_state()
-    emit("state-change", parse_game_state(state))
+
+    emit("game::start")
+    emit("game::state", parse_game_state(state))
 
 
 @socketio.on('draw-card')
 def draw_card(data):
-    game.draw(data['player'])
+    playerId = data['playerId']
+
+    game = games[room]
+    game.draw(playerId)
     state = game.get_state()
     emit("state-change", parse_game_state(state))
 
 
 @socketio.on('play-card')
 def draw_card(data):
-    game.play_card(data['player'], data['card'])
+    playerId, cardId = data['playerId'], data['cardId']
+
+    game = games[room]
+    game.play_card(playerId, cardId)
     state = game.get_state()
     emit("state-change", parse_game_state(state))
-
-
-@socketio.on('connect')
-def connect():
-    return
 
 
 if __name__ == '__main__':

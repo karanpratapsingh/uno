@@ -6,20 +6,29 @@ import Header from '../components/header';
 import socket from '../lib/socket';
 import { Routes } from '../types/routes';
 
+import { toast } from 'react-toastify';
+
 function Play() {
+  const navigate = useNavigate();
   const { state } = useLocation();
+  const isValidState = state && 'name' in state && 'room' in state;
+
+  useEffect(() => {
+    if (!isValidState) {
+      navigate(Routes.Home);
+      // TODO: notify
+    }
+  }, [isValidState]);
 
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [started, setStarted] = useState(false);
 
   const [players, setPlayers] = useState([]);
   const [config, setConfig] = useState({
-    name: state.name,
-    room: state.room,
+    name: state?.name || '',
+    room: state?.room || '',
     hand_size: 4,
   });
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const { name, room } = config;
@@ -38,23 +47,43 @@ function Play() {
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
 
-    function onRoom(data: any): void {
-      setPlayers(data.players);
-    }
+    socket.on('notify', data => {
+      const { type, message } = data;
+      switch (type) {
+        case 'info':
+          toast.info(message);
+          break;
+        case 'success':
+          toast.success(message);
+          break;
+        case 'warn':
+          toast.warn(message);
+          break;
+        case 'error':
+          toast.error(message);
+          break;
+      }
+    });
 
-    socket.on('room', onRoom);
+    socket.on('room', data => {
+      setPlayers(data.players);
+    });
+
+    socket.on('game::start', () => {
+      setStarted(true);
+    });
 
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('room', onRoom);
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('room');
+      socket.off('notify');
     };
   }, []);
 
   function onNewGame() {
-    const { hand_size } = config;
-    socket.emit('new-game', { hand_size });
-    setStarted(true);
+    const { room, hand_size } = config;
+    socket.emit('game::init', { room, hand_size });
   }
 
   function onLeave() {
@@ -66,9 +95,8 @@ function Play() {
   let content: React.ReactNode = null;
 
   if (started) {
-    content = <Game socket={socket} />;
+    content = <Game socket={socket} started={started} />;
   } else {
-    console.log(players);
     let status = 'Waiting for second player to the join...';
 
     if (players.length > 1) {

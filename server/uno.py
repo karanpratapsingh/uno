@@ -1,6 +1,11 @@
 import random
 import json
 import collections
+from player import Player
+import logging
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 COLORS = ['red', 'blue', 'green', 'yellow']
 
@@ -34,54 +39,60 @@ DECK = [Card(color, value)
 
 
 SHUFFLE_FREQ = 10
-PLAYERS = 2
 
 
 class Game:
-    def __init__(self):
-        self.deck = DECK
-        self.moves = []  # TODO: Maintain last moves for rule enforcing
+    def __init__(self, players, hand_size):
+        self.hands = collections.defaultdict(list)
+        self.players = players
 
-    def new(self, hand_size):
-        deck = self.deck[::]
+        if len(self.players) < 2:
+            raise Exception("Cannot start the game without atleast 2 players")
 
+        # Shuffle deck
+        deck = DECK[::]
         for _ in range(SHUFFLE_FREQ):
             random.shuffle(deck)
 
-        hands = collections.defaultdict(list)
-        player_cards = deck[:PLAYERS * hand_size]
-        remaining_cards = deck[(PLAYERS * hand_size) + 1:]
+        TOTAL_PLAYERS = len(players)
+        self.remaining_cards = deck[(TOTAL_PLAYERS * hand_size) + 1:]
+        player_cards = deck[:TOTAL_PLAYERS * hand_size]
 
+        # Distribute cards
         i = 0
         while i < len(player_cards):
-            for player in range(PLAYERS):
-                hands[f'player_{player+1}'].append(player_cards[i])
+            for player in players:
+                self.hands[player].append(player_cards[i])
                 i += 1
 
-        top_card = random.choice(remaining_cards)
+        # Pick top card
+        top_card = random.choice(self.remaining_cards)
         while top_card.isSpecial():
-            top_card = random.choice(remaining_cards)
+            top_card = random.choice(self.remaining_cards)
 
-        self.hands = hands
-        self.remaining_cards = remaining_cards
         self.game_stack = [top_card]
 
     def get_state(self):
         return (self.hands, self.remaining_cards, self.game_stack)
 
-    def draw(self, player):
+    def draw(self, playerId):
+        player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
+
         new_card = self.remaining_cards.pop()
         player_cards.append(new_card)
 
-    # TODO: Log this
-    # TODO: make room functionality
-    def play_card(self, player, card):
+    def play_card(self, playerId, cardId):
+        player = self.find_object(self.players, playerId)
+
         player_cards = self.hands[player]
-
-        played_card = Card(card['color'], card['value'])
-        idx = [c.id for c in player_cards].index(played_card.id)
-        print(f'\n\n {played_card} {idx} \n\n')
+        idx = self.find_object_idx(player_cards, cardId)
         player_cards.pop(idx)
+        self.game_stack.insert(0, self.game_stack)
 
-        self.game_stack.append(played_card)
+    def find_object(self, objects, id):
+        idx = self.find_object_idx(objects, id)
+        return objects[idx]
+
+    def find_object_idx(self, objects, id):
+        return [obj.id for obj in objects].index(id)
