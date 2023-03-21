@@ -96,7 +96,16 @@ function Play(): React.ReactElement {
     };
   }, []);
 
-  function onStartGame(): void {
+  useEffect(() => {
+    socket.io.on('reconnect', () => {
+      if (started) {
+        const { room, hand_size } = config;
+        socket.emit(Events.GAME_START, { room, hand_size });
+      }
+    });
+  }, [started, config]);
+
+  function onGameStart(): void {
     const { room, hand_size } = config;
     socket.emit(Events.GAME_START, { room, hand_size });
   }
@@ -135,7 +144,7 @@ function Play(): React.ReactElement {
           ))}
         </div>
         <span className='mt-6 text-xl italic text-gray-500'>{status}</span>
-        <button onClick={onStartGame} className='btn-wide btn mt-8'>
+        <button onClick={onGameStart} className='btn-wide btn mt-8'>
           Start
         </button>
       </div>
