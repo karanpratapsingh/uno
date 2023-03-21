@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useMemo } from 'react';
-import { getCardImageURL } from '../lib/card';
+import { getCardImageURL } from '../lib/image';
 import { Card, Player } from '../types/game';
 
 interface UnoCardProps {

@@ -1,7 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import StartModal from '../components/modals/start';
+import { getAssetURL } from '../lib/image';
 import { GameAction, GameConfig } from '../types/game';
 import { Routes } from '../types/routes';
+
+const logoURL = getAssetURL('../assets/images/logo.svg');
 
 function Home(): React.ReactElement {
   const navigate = useNavigate();
@@ -19,7 +22,8 @@ function Home(): React.ReactElement {
 
   return (
     <div className='flex h-full w-full flex-col items-center justify-center p-4'>
-      <div className='flex flex-col'>
+      <img className='h-48' src={logoURL} alt='uno logo' />
+      <div className='mt-10 flex flex-col'>
         <label
           htmlFor={`${GameAction.Host}-modal`}
           className='btn-wide btn mb-4'
