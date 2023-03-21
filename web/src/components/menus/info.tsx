@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import { RiShareForwardFill } from 'react-icons/ri';
 import { toast } from 'react-toastify';
-import { WEB_HTTP_URL } from '../../config';
+import { WEB_HTTP_URL } from '../../config/web';
 import { GameConfig } from '../../types/game';
 
 interface InfoMenuProps {
