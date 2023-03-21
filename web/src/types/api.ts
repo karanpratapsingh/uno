@@ -1,3 +1,4 @@
-export type RoomExistsResponse = {
-    exists: boolean;
-}
+export type AllowPlayerResponse = {
+  allow: boolean;
+  reason: string | null;
+};

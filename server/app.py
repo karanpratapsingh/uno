@@ -27,10 +27,16 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 state = State()
 
 
-@app.get('/api/room/<room>')
-def room_exists(room):
-    exists = state.room_exists(room)
-    return {'exists': exists}
+@app.post('/api/game/allow')
+def allow_player():
+    try:
+        action, name, room = parse_data_args(request.json, ['action', 'name', 'room'])
+        player = Player(name)
+        allow, reason = state.allow_player(action, room, player)
+        return {'allow': allow, 'reason': reason}
+    except Exception as ex:
+        log.error(ex)
+        return {'allow': False, 'reason': str(ex)}
 
 
 @socketio.on(events.PLAYER_JOIN)
@@ -46,7 +52,7 @@ def on_join(data):
         # Add extra player for development
         if env.ENVIRONMENT == "development":
             dev_player = Player("developer")
-            state.add_player_to_room(room, dev_player)
+            # state.add_player_to_room(room, dev_player)
 
         players = state.get_players_by_room(room)
         emit(events.GAME_ROOM, {'players': parse_object_list(players)}, to=room)
@@ -71,7 +77,7 @@ def on_leave(data):
 
 
 @socketio.on(events.GAME_START)
-def on_new_game(data):
+def on_game_start(data):
     try:
         room, hand_size = parse_data_args(data, ['room', 'hand_size'])
 

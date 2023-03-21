@@ -17,9 +17,35 @@ class State:
     def __init__(self):
         self.redis = Redis(host=REDIS_HOST)
 
-    def room_exists(self, room: str) -> bool:
-        exists = self.redis.exists(f'players_{room}')
-        return bool(exists)
+    def allow_player(self, action: str, room: str, player: Player) -> (bool, Optional[str]):
+        # Validate player
+        if not player.name or player.name == '':
+            return (False, f'name cannot be blank')
+
+        if ' ' in player.name:
+            return (False, f'name should not contain white spaces')
+
+        # Validate room
+        if room == '':
+            return (False, f'room should not be empty')
+
+        if action == "Join":  # Check if room exists
+            exists = bool(self.redis.exists(f'players_{room}'))
+            if not exists:
+                return (False, f'cannot join game, room {room} does not exist')
+
+        # Validate game
+        started = bool(self.get_game_by_room(room))
+        players = self.get_players_by_room(room)
+
+        if started:
+            if player not in players:
+                return (False, f'cannot join, game in the room {room} has already started')
+        else:
+            if player in players:
+                return (False, f"name {player.name} is already taken for this room, try a different name")
+
+        return (True, None)
 
     def get_game_by_room(self, room: str) -> Optional[Game]:
         obj = self.redis.get(f'game_{room}')

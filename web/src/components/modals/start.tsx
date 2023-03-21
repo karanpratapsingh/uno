@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import shortid from 'shortid';
-import { defaultHandSize, maxHandSize, minHandSize } from '../../lib/state';
+import { defaultHandSize } from '../../lib/state';
 import { GameAction } from '../../types/game';
 import Input from '../input';
 
@@ -64,35 +63,6 @@ function StartModal(props: StartModalProps): React.ReactElement {
     }
   }
 
-  function onSubmit(): void {
-    if (name === '') {
-      toast.error('name should not be blank');
-      return;
-    }
-
-    if (name.includes(' ')) {
-      toast.error('name should not contain blank spaces');
-      return;
-    }
-
-    if (room === '') {
-      toast.error('room id should not be empty');
-      return;
-    }
-
-    if (handSize > maxHandSize) {
-      toast.error(`hand size should not be greater than ${maxHandSize}`);
-      return;
-    }
-
-    if (handSize < minHandSize) {
-      toast.error(`hand size should not be less than ${minHandSize}`);
-      return;
-    }
-
-    onStart(action, name, room, handSize);
-  }
-
   return (
     <>
       <input type='checkbox' id={`${action}-modal`} className='modal-toggle' />
@@ -127,7 +97,10 @@ function StartModal(props: StartModalProps): React.ReactElement {
             >
               Cancel
             </label>
-            <label className='btn' onClick={onSubmit}>
+            <label
+              className='btn'
+              onClick={() => onStart(action, name, room, handSize)}
+            >
               {action}
             </label>
           </div>

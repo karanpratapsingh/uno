@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import StartModal from '../components/modals/start';
-import { roomExists } from '../lib/api';
+import { allowPlayer } from '../lib/api';
 import { getAssetURL } from '../lib/image';
+import { maxHandSize, minHandSize } from '../lib/state';
 import { GameAction, GameConfig } from '../types/game';
 import { Routes } from '../types/routes';
 
@@ -16,18 +17,33 @@ function Home(): React.ReactElement {
     name: string,
     room: string,
     hand_size: number
-  ) {
-    if (action === GameAction.Join) {
-      const exists = await roomExists(room);
-      if (!exists) {
-        toast.error(`room ${room} does not exist`);
+  ): Promise<void> {
+    try {
+      const { allow, reason } = await allowPlayer(action, name, room);
+      if (!allow) {
+        toast.error(reason);
         return;
       }
-    }
 
-    navigate(Routes.Play, {
-      state: { action, name, room, hand_size } as GameConfig,
-    });
+      if (action === GameAction.Host) {
+        if (hand_size > maxHandSize) {
+          toast.error(`hand size should not be greater than ${maxHandSize}`);
+          return;
+        }
+
+        if (hand_size < minHandSize) {
+          toast.error(`hand size should not be less than ${minHandSize}`);
+          return;
+        }
+      }
+
+      navigate(Routes.Play, {
+        state: { action, name, room, hand_size } as GameConfig,
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error('encountered error while joining game');
+    }
   }
 
   return (
