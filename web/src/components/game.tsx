@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { Card, Events, GameStatePayload, Hands, Player } from '../types/game';
+import Avatar from './avatar';
 import UnoCard from './uno-card';
 
 interface GameProps {
@@ -53,11 +54,16 @@ function Game(props: GameProps): React.ReactElement {
   const ownCards = hands[currentPlayer.id];
 
   return (
-    <div className='flex flex-1 flex-col justify-center'>
+    <div className='flex flex-1 flex-col'>
       {/* Other player */}
-      <div className='flex flex-col'>
-        <span className='my-4 text-center'>{otherPlayer.name}</span>
-        <div className='flex items-center'>
+      <div className='flex flex-col items-center justify-center'>
+        <Avatar
+          className='my-4'
+          name={otherPlayer.name}
+          size='small'
+          type='row'
+        />
+        <div className='flex'>
           {otherCards.map((card: Card) => (
             <UnoCard
               key={card.id}
@@ -99,8 +105,8 @@ function Game(props: GameProps): React.ReactElement {
       </div>
 
       {/* Current Player */}
-      <div className='flex flex-col'>
-        <div className='flex items-center'>
+      <div className='flex flex-col items-center justify-center'>
+        <div className='flex'>
           {ownCards.map((card: Card) => (
             <UnoCard
               currentPlayer={currentPlayer}
@@ -109,7 +115,12 @@ function Game(props: GameProps): React.ReactElement {
             />
           ))}
         </div>
-        <span className='my-4 text-center'>{currentPlayer.name}</span>
+        <Avatar
+          className='mt-4'
+          name={currentPlayer.name}
+          size='small'
+          type='row'
+        />
       </div>
     </div>
   );
