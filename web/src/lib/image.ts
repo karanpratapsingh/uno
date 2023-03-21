@@ -8,7 +8,7 @@ import { Card } from '../types/game';
  */
 export function getCardImageURL(card: Card, hidden?: boolean): string {
   if (hidden) {
-    return getAssetURL('../assets/images/cards/back.png');
+    return getAssetURL('../assets/images/cards/back.svg');
   }
 
   return getAssetURL(`../assets/images/cards/${card.color}/${card.value}.svg`);

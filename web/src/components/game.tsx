@@ -78,7 +78,7 @@ function Game(props: GameProps): React.ReactElement {
 
       {/* Card space */}
       <div className='flex flex-1 items-center justify-center'>
-        <div className='flex flex-1'>
+        <div className='flex flex-1 justify-center'>
           <div className='stack' onClick={drawCard}>
             {remainingCards.map((card: Card) => (
               <UnoCard
