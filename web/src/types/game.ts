@@ -1,20 +1,5 @@
 export type Hands = Record<string, Card[]>;
 
-export type GameStatePayload = {
-  hands: Hands;
-  game_stack: Card[];
-  remaining_cards: Card[];
-};
-
-export type GameNotifyPaylod = {
-  type: string;
-  message: string;
-};
-
-export type GameRoomPaylod = {
-  players: Player[];
-};
-
 export enum Events {
   GAME_ROOM = 'game::room',
   GAME_START = 'game::start',
