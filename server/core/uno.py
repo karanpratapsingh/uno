@@ -1,29 +1,19 @@
-from lib.notification import Notification
-import random
-import json
 import collections
+import json
 import logging
-from typing import List, DefaultDict, Tuple, Any
+import random
+from typing import Any, DefaultDict, List, Tuple
+
+from lib.notification import Notification
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-COLORS = ['red', 'blue', 'green', 'yellow']
-NUMBER_CARDS = [str(i) for i in (list(range(0, 10)) + list(range(1, 10)))]
-DRAW_TWO_CARDS = ['draw-two'] * 2
-REVERSE_CARDS = ['reverse'] * 2
-SKIP_CARDS = ['skip'] * 2
-
-DRAW_FOUR_CARDS = ['draw-four'] * 4
-WILD_CARDS = ['wild'] * 4
-COLOR_CARDS = NUMBER_CARDS + DRAW_TWO_CARDS + REVERSE_CARDS + SKIP_CARDS
-
 
 class Player:
     def __init__(self, name):
-        self.id = f'player-{name}'
-        self.name = name
-        self.online = True
+        self.id: str = f'player-{name}'
+        self.name: str = name
 
     def __repr__(self) -> str:
         return f"Player(id={self.id}, name={self.name})"
@@ -37,17 +27,17 @@ class Player:
 
 class Card:
     def __init__(self, color, value):
-        self.id = f'{value}-{color}'
-        self.color = color
-        self.value = value
+        self.id: str = f'{value}-{color}'
+        self.color: str = color
+        self.value: str = value
 
     def is_special(self) -> bool:
-        special_cards = set(DRAW_TWO_CARDS + REVERSE_CARDS +
-                            SKIP_CARDS + DRAW_FOUR_CARDS + WILD_CARDS)
+        special_cards = set(Deck.DRAW_TWO_CARDS + Deck.REVERSE_CARDS +
+                            Deck.SKIP_CARDS + Deck.DRAW_FOUR_CARDS + Deck.WILD_CARDS)
         return self.value in special_cards or self.color == 'black'
 
     def is_color_special(self) -> bool:
-        special_cards = set(DRAW_TWO_CARDS + REVERSE_CARDS + SKIP_CARDS)
+        special_cards = set(Deck.DRAW_TWO_CARDS + Deck.REVERSE_CARDS + Deck.SKIP_CARDS)
         return self.value in special_cards or self.color != 'black'
 
     def is_black(self) -> bool:
@@ -63,10 +53,31 @@ class Card:
         return f'Card(color={self.color}, value={self.value})'
 
 
-SHUFFLE_FREQ = 50
+class Deck:
+    SHUFFLE_FREQ = 50
+    COLORS = ['red', 'blue', 'green', 'yellow']
+    NUMBER_CARDS = [str(i) for i in (list(range(0, 10)) + list(range(1, 10)))]
+    DRAW_TWO_CARDS = ['draw-two'] * 2
+    REVERSE_CARDS = ['reverse'] * 2
+    SKIP_CARDS = ['skip'] * 2
 
-DECK: List[Card] = [Card(color, value) for color in COLORS for value in COLOR_CARDS] + ([Card('black', value)
-                                                                                         for value in (DRAW_FOUR_CARDS + WILD_CARDS)])
+    DRAW_FOUR_CARDS = ['draw-four'] * 4
+    WILD_CARDS = ['wild'] * 4
+    COLOR_CARDS = NUMBER_CARDS + DRAW_TWO_CARDS + REVERSE_CARDS + SKIP_CARDS
+
+    def __init__(self):
+        color_cards = [Card(color, value) for color in self.COLORS for value in self.COLOR_CARDS]
+        black_cards = [Card('black', value) for value in (self.DRAW_FOUR_CARDS + self.WILD_CARDS)]
+
+        self.cards: List[Card] = color_cards + black_cards
+        self.shuffle()
+
+    def get_cards(self) -> List[Card]:
+        return self.cards
+
+    def shuffle(self):
+        for _ in range(self.SHUFFLE_FREQ):
+            random.shuffle(self.cards)
 
 
 class Game:
@@ -74,20 +85,18 @@ class Game:
         self.hands: DefaultDict[Player, List[Card]] = collections.defaultdict(list)
         self.players: List[Player] = list(players)
         self.notify = Notification(room)
+        self.deck = Deck()
 
         if len(self.players) < 2:
             raise Exception("need at least 2 players to start the game")
             return
 
-        # Shuffle deck
-        deck = DECK[::]
-        for _ in range(SHUFFLE_FREQ):
-            random.shuffle(deck)
+        cards = self.deck.get_cards()
 
         TOTAL_PLAYERS = len(players)
-        self.remaining_cards: List[Card] = deck[(
+        self.remaining_cards: List[Card] = cards[(
             TOTAL_PLAYERS * hand_size) + 1:]
-        player_cards = deck[:TOTAL_PLAYERS * hand_size]
+        player_cards = cards[:TOTAL_PLAYERS * hand_size]
 
         # Distribute cards (alternatively)
         i = 0
