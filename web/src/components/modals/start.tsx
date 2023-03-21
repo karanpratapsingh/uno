@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import shortid from 'shortid';
 import { defaultHandSize, maxHandSize, minHandSize } from '../../lib/state';
 import { GameAction } from '../../types/game';
 import Input from '../input';
-import shortid from 'shortid';
 
 interface StartModalProps {
   action: GameAction;
@@ -20,6 +21,22 @@ function StartModal(props: StartModalProps): React.ReactElement {
   const [name, setName] = useState<string>('');
   const [room, setRoom] = useState<string>('');
   const [handSize, setHandSize] = useState<number>(defaultHandSize);
+
+  const [queryParams, setQueryParams] = useSearchParams();
+
+  useEffect(() => {
+    const room = queryParams.get('join');
+    if (room) {
+      setRoom(room);
+      const modal = document.getElementById(
+        `${GameAction.Join}-modal`
+      ) as HTMLInputElement;
+      if (modal) {
+        modal.checked = true;
+        setQueryParams();
+      }
+    }
+  }, [queryParams]);
 
   useEffect(() => {
     if (action === GameAction.Host) {
@@ -104,7 +121,10 @@ function StartModal(props: StartModalProps): React.ReactElement {
             />
           )}
           <div className='modal-action'>
-            <label htmlFor={`${action}-modal`} className='btn-ghost btn'>
+            <label
+              htmlFor={`${action}-modal`}
+              className='btn-ghost btn text-red-400'
+            >
               Cancel
             </label>
             <label className='btn' onClick={onSubmit}>
