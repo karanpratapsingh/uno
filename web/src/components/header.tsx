@@ -16,7 +16,7 @@ function Header(props: HeaderProps): React.ReactElement {
   const { isConnected, config, onLeave } = props;
 
   return (
-    <div className='navbar bg-base-100'>
+    <div className='navbar'>
       <div className='navbar-start'>
         <InfoMenu config={config} isConnected={isConnected} />
       </div>

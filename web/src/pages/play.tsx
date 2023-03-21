@@ -143,7 +143,7 @@ function Play(): React.ReactElement {
   }
 
   return (
-    <div className='flex h-full w-full flex-col p-4'>
+    <div className='flex h-full w-full flex-col px-6 py-4'>
       <Header
         socket={socket}
         isConnected={isConnected}
@@ -156,7 +156,7 @@ function Play(): React.ReactElement {
         <div className='flex flex-1 flex-col items-center justify-center'>
           <div className='loader' />
           <span className='mt-8 text-center text-xl italic text-gray-500'>
-            connecting...
+            Connecting...
           </span>
         </div>
       )}
