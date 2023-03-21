@@ -10,7 +10,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from lib.notification import Notification
 from lib.parser import parse_data_args, parse_game_state, parse_object_list
 
-from uno import Game, Player
+from core.uno import Game, Player
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
