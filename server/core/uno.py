@@ -9,11 +9,13 @@ log.setLevel(logging.DEBUG)
 
 COLORS = ['red', 'blue', 'green', 'yellow']
 NUMBER_CARDS = [str(i) for i in (list(range(0, 10)) + list(range(1, 10)))]
-PLUS_2_CARDS = ['draw-two'] * 2
+DRAW_TWO_CARDS = ['draw-two'] * 2
 REVERSE_CARDS = ['reverse'] * 2
 SKIP_CARDS = ['skip'] * 2
-DRAW_CARDS = ['draw-four', 'wild']
-COLOR_CARDS = NUMBER_CARDS + PLUS_2_CARDS + REVERSE_CARDS + SKIP_CARDS
+
+DRAW_FOUR_CARDS = ['draw-four'] * 4
+WILD_CARDS = ['wild'] * 4
+COLOR_CARDS = NUMBER_CARDS + DRAW_TWO_CARDS + REVERSE_CARDS + SKIP_CARDS
 
 
 class Player:
@@ -39,9 +41,22 @@ class Card:
         self.value = value
 
     def is_special(self):
-        special_cards = set(PLUS_2_CARDS + REVERSE_CARDS +
-                            SKIP_CARDS + DRAW_CARDS)
+        special_cards = set(DRAW_TWO_CARDS + REVERSE_CARDS +
+                            SKIP_CARDS + DRAW_FOUR_CARDS + WILD_CARDS)
         return self.value in special_cards or self.color == 'black'
+
+    def is_color_special(self):
+        special_cards = set(DRAW_TWO_CARDS + REVERSE_CARDS + SKIP_CARDS)
+        return self.value in special_cards or self.color != 'black'
+
+    def is_black(self):
+        return self.color == 'black'
+
+    def is_draw_four(self):
+        return self.value == 'draw-four'
+
+    def is_wild(self):
+        return self.value == 'wild'
 
     def __repr__(self):
         return f'Card(color={self.color}, value={self.value})'
@@ -50,7 +65,7 @@ class Card:
 SHUFFLE_FREQ = 10
 
 DECK = [Card(color, value)
-        for color in COLORS for value in COLOR_CARDS] + ([Card('black', value) for value in DRAW_CARDS] * 4)
+        for color in COLORS for value in COLOR_CARDS] + ([Card('black', value) for value in (DRAW_FOUR_CARDS + WILD_CARDS)])
 
 
 class Game:
@@ -100,16 +115,50 @@ class Game:
         player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
         card = self.find_object(player_cards, cardId)
+        top_card = self.game_stack[0]
 
-        # TODO: Enforce rules
-        
+        def execute_hand():
+            nonlocal player_cards, card
 
-        # Find and remove card from the current player's hand
-        idx = self.find_object_idx(player_cards, card.id)
-        player_cards.pop(idx)
+            # Find and remove card from the current player's hand
+            idx = self.find_object_idx(player_cards, card.id)
+            player_cards.pop(idx)
 
-        # Insert played card top of the game stack
-        self.game_stack.insert(0, card)
+            # Insert played card top of the game stack
+            self.game_stack.insert(0, card)
+
+            if len(player_cards) == 1:
+                self.notify.success(f"UNO!")
+
+        # Can play any card on top of black cards
+        if not card.is_black() and top_card.is_black():
+            execute_hand()
+            return
+
+        if card.is_black() and top_card.is_black():
+            # Cannot play wild card on top of draw four and vice-versa
+            if ((card.is_draw_four() and top_card.is_wild()) or
+                    (card.is_wild() and top_card.is_draw_four())):
+                self.notify.error(
+                    f"cannot play a {card.value} card top of a {top_card.value} card")
+                return
+            execute_hand()
+            return
+
+        same_color = card.color == top_card.color
+        same_value = card.value == top_card.value
+
+        if same_color or same_value:
+            execute_hand()
+            return
+
+        if same_color and card.is_color_special():
+            execute_hand()
+            return
+
+        if card.is_black():
+            execute_hand()
+            return
 
     def find_object(self, objects, id):
         idx = self.find_object_idx(objects, id)
