@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import { Card, Events, GameStatePayload, Hands, Player } from '../types/game';
+import { Card, Events, Hands, Player } from '../types/game';
+import { GameStateResponse } from '../types/ws';
 import Avatar from './avatar';
 import UnoCard from './uno-card';
 
@@ -20,7 +21,7 @@ function Game(props: GameProps): React.ReactElement {
   const [remainingCards, setRemainingCards] = useState<Card[]>([]);
 
   useEffect(() => {
-    function onGameState(data: GameStatePayload): void {
+    function onGameState(data: GameStateResponse): void {
       setHands(data.hands);
       setGameStack(data.game_stack);
       setRemainingCards(data.remaining_cards);

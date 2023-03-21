@@ -6,15 +6,9 @@ import Game from '../components/game';
 import Header from '../components/header';
 import socket from '../lib/socket';
 import { defaultHandSize, validateGameConfig } from '../lib/state';
-import {
-  Events,
-  GameAction,
-  GameConfig,
-  GameNotifyPaylod,
-  GameRoomPaylod,
-  Player,
-} from '../types/game';
+import { Events, GameAction, GameConfig, Player } from '../types/game';
 import { Routes } from '../types/routes';
+import { GameNotifyResponse, GameRoomResponse } from '../types/ws';
 
 function Play(): React.ReactElement {
   const navigate = useNavigate();
@@ -58,7 +52,7 @@ function Play(): React.ReactElement {
     }
     socket.on('disconnect', onDisconnect);
 
-    function onGameNotify(data: GameNotifyPaylod): void {
+    function onGameNotify(data: GameNotifyResponse): void {
       const { type, message } = data;
       switch (type) {
         case 'info':
@@ -77,7 +71,7 @@ function Play(): React.ReactElement {
     }
     socket.on(Events.GAME_NOTIFY, onGameNotify);
 
-    function onGameRoom(data: GameRoomPaylod): void {
+    function onGameRoom(data: GameRoomResponse): void {
       setPlayers(data.players);
     }
     socket.on(Events.GAME_ROOM, onGameRoom);
