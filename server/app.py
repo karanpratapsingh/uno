@@ -18,6 +18,8 @@ log.setLevel(logging.DEBUG)
 
 # Server config
 app = Flask(__name__)
+app.logger.setLevel(logging.DEBUG)
+
 # TODO: restrict origin for production
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -85,7 +87,7 @@ def on_new_game(data):
                 log.error(ex)
                 return
 
-        log.info(f"starting a new game with {players}")
+        log.info(f"starting a new game in room {room} with players {players}")
         game_state = game.get_state()
         emit(events.GAME_START, to=room)
         emit(events.GAME_STATE, parse_game_state(game_state), to=room)
