@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
+import { SERVER_WS_URL } from '../config';
 
-const socket = io('localhost:5000/', {
+const socket = io(SERVER_WS_URL, {
   transports: ['websocket'],
   autoConnect: true,
 });
