@@ -92,8 +92,12 @@ function Play(): React.ReactElement {
 
   useEffect(() => {
     function onReconnect() {
+      const { name, room, hand_size } = config;
+      // Re-join on reconnect
+      socket.emit(Events.PLAYER_JOIN, { name, room });
+
       if (started) {
-        const { room, hand_size } = config;
+        // Restart the game if game was already started
         socket.emit(Events.GAME_START, { room, hand_size });
       }
     }
