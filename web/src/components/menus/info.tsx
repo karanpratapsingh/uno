@@ -19,7 +19,7 @@ function InfoMenu(props: InfoMenuProps): React.ReactElement {
       >
         <div className='p-2'>
           <div className='flex justify-between'>
-            <b>Status</b>
+            <b>status</b>
             <div
               className={clsx(
                 isConnected && 'badge-success',
@@ -31,10 +31,10 @@ function InfoMenu(props: InfoMenuProps): React.ReactElement {
             </div>
           </div>
           <p className='flex justify-between'>
-            <b>Name</b> <span className='ml-2'>{config.name}</span>
+            <b>player</b> <span className='ml-2'>{config.name}</span>
           </p>
           <p className='flex justify-between'>
-            <b>Room</b> <span className='ml-2'>{config.room}</span>
+            <b>room</b> <span className='ml-2'>{config.room}</span>
           </p>
         </div>
       </div>
