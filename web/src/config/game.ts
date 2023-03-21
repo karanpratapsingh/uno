@@ -1,1 +1,1 @@
-export const GAME_STATE_INTERVAL = 10_000;
+export const GAME_STATE_REFETCH_INTERVAL = 10_000;

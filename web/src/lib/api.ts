@@ -1,4 +1,4 @@
-import { SERVER_HTTP_URL } from '../config';
+import { SERVER_HTTP_URL } from '../config/server';
 import { RoomExistsResponse } from '../types/api';
 
 export async function roomExists(room: string): Promise<boolean> {

@@ -110,14 +110,26 @@ def on_draw_card(data):
 @socketio.on(events.GAME_PLAY)
 def on_play_game(data):
     try:
-        room, playerId, cardId = parse_data_args(
-            data, ['room', 'playerId', 'cardId'])
+        room, playerId, cardId = parse_data_args(data, ['room', 'playerId', 'cardId'])
 
         game = state.get_game_by_room(room)
         game.play(playerId, cardId)
         game_state = game.get_state()
         emit(events.GAME_STATE, parse_game_state(game_state), to=room)
         state.update_game_in_room(room, game)
+    except Exception as ex:
+        log.error(ex)
+
+
+@socketio.on(events.GAME_STATE)
+def on_game_state(data):
+    try:
+        room, = parse_data_args(data, ['room'])
+
+        game = state.get_game_by_room(room)
+        if game:
+            game_state = game.get_state()
+            emit(events.GAME_STATE, parse_game_state(game_state), to=room)
     except Exception as ex:
         log.error(ex)
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
+import { GAME_STATE_REFETCH_INTERVAL } from '../config/game';
 import { Card, Events, Hands, Player } from '../types/game';
 import { GameStateResponse } from '../types/ws';
 import Avatar from './avatar';
@@ -19,6 +20,16 @@ function Game(props: GameProps): React.ReactElement {
   const [hands, setHands] = useState<Hands | null>(null);
   const [gameStack, setGameStack] = useState<Card[]>([]);
   const [remainingCards, setRemainingCards] = useState<Card[]>([]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      socket.emit(Events.GAME_STATE, { room });
+    }, GAME_STATE_REFETCH_INTERVAL);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     function onGameState(data: GameStateResponse): void {

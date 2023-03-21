@@ -91,12 +91,17 @@ function Play(): React.ReactElement {
   }, []);
 
   useEffect(() => {
-    socket.io.on('reconnect', () => {
+    function onReconnect() {
       if (started) {
         const { room, hand_size } = config;
         socket.emit(Events.GAME_START, { room, hand_size });
       }
-    });
+    }
+    socket.io.on('reconnect', onReconnect);
+
+    return () => {
+      socket.io.off('reconnect', onReconnect);
+    };
   }, [started, config]);
 
   function onGameStart(): void {
