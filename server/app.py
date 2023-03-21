@@ -85,6 +85,7 @@ def on_new_game(data):
                 log.info(f"starting a new game with {players}")
             except Exception as ex:
                 Notification(room).error(ex)
+                log.error(ex)
                 return
 
         state = game.get_state()
