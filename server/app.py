@@ -11,6 +11,7 @@ from lib.notification import Notification
 from lib.parser import parse_data_args, parse_game_state, parse_object_list
 
 from core.uno import Game, Player
+from typing import DefaultDict, Set
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -22,8 +23,8 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Game state
-rooms = collections.defaultdict(set)
-games = collections.defaultdict(Game)
+rooms: DefaultDict[str, Set[Player]] = collections.defaultdict(set)
+games: DefaultDict[str, Game] = collections.defaultdict(Game)
 
 
 @socketio.on(events.PLAYER_JOIN)

@@ -3,6 +3,7 @@ import random
 import json
 import collections
 import logging
+from typing import List, DefaultDict, Tuple, Any
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -24,13 +25,13 @@ class Player:
         self.name = name
         self.online = True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Player(id={self.id}, name={self.name})"
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.id)
 
-    def __eq__(self, obj):
+    def __eq__(self, obj) -> bool:
         return isinstance(obj, type(self)) and self.id == obj.id
 
 
@@ -40,38 +41,38 @@ class Card:
         self.color = color
         self.value = value
 
-    def is_special(self):
+    def is_special(self) -> bool:
         special_cards = set(DRAW_TWO_CARDS + REVERSE_CARDS +
                             SKIP_CARDS + DRAW_FOUR_CARDS + WILD_CARDS)
         return self.value in special_cards or self.color == 'black'
 
-    def is_color_special(self):
+    def is_color_special(self) -> bool:
         special_cards = set(DRAW_TWO_CARDS + REVERSE_CARDS + SKIP_CARDS)
         return self.value in special_cards or self.color != 'black'
 
-    def is_black(self):
+    def is_black(self) -> bool:
         return self.color == 'black'
 
-    def is_draw_four(self):
+    def is_draw_four(self) -> bool:
         return self.value == 'draw-four'
 
-    def is_wild(self):
+    def is_wild(self) -> bool:
         return self.value == 'wild'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Card(color={self.color}, value={self.value})'
 
 
-SHUFFLE_FREQ = 10
+SHUFFLE_FREQ = 50
 
-DECK = [Card(color, value)
-        for color in COLORS for value in COLOR_CARDS] + ([Card('black', value) for value in (DRAW_FOUR_CARDS + WILD_CARDS)])
+DECK: List[Card] = [Card(color, value) for color in COLORS for value in COLOR_CARDS] + ([Card('black', value)
+                                                                                         for value in (DRAW_FOUR_CARDS + WILD_CARDS)])
 
 
 class Game:
     def __init__(self, room,  players, hand_size):
-        self.hands = collections.defaultdict(list)
-        self.players = list(players)
+        self.hands: DefaultDict[Player, List[Card]] = collections.defaultdict(list)
+        self.players: List[Player] = list(players)
         self.notify = Notification(room)
 
         if len(self.players) < 2:
@@ -84,7 +85,8 @@ class Game:
             random.shuffle(deck)
 
         TOTAL_PLAYERS = len(players)
-        self.remaining_cards = deck[(TOTAL_PLAYERS * hand_size) + 1:]
+        self.remaining_cards: List[Card] = deck[(
+            TOTAL_PLAYERS * hand_size) + 1:]
         player_cards = deck[:TOTAL_PLAYERS * hand_size]
 
         # Distribute cards (alternatively)
@@ -99,19 +101,19 @@ class Game:
         while top_card.is_special():
             top_card = random.choice(self.remaining_cards)
 
-        self.game_stack = [top_card]
+        self.game_stack: List[Card] = [top_card]
 
-    def get_state(self):
+    def get_state(self) -> Tuple[Any]:
         return (self.hands, self.remaining_cards, self.game_stack)
 
-    def draw(self, playerId):
+    def draw(self, playerId) -> None:
         player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
 
         new_card = self.remaining_cards.pop()
         player_cards.append(new_card)
 
-    def play(self, playerId, cardId):
+    def play(self, playerId, cardId) -> None:
         player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
         card = self.find_object(player_cards, cardId)

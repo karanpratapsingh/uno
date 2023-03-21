@@ -1,4 +1,7 @@
-def parse_data_args(data, args):
+from typing import Dict, Any, List, Tuple
+
+
+def parse_data_args(data: Dict[str, Any], args: List[str]) -> List[Any]:
     missing_args = []
     values = []
 
@@ -14,11 +17,11 @@ def parse_data_args(data, args):
     return values
 
 
-def parse_object_list(objects):
+def parse_object_list(objects) -> List[Any]:
     return [obj.__dict__ for obj in list(objects)]
 
 
-def parse_game_state(state):
+def parse_game_state(state) -> Dict[str, Any]:
     (hands, remaining_cards, game_stack) = state
     parsed_hands = {key.id: parse_object_list(
         value) for key, value in hands.items()}
