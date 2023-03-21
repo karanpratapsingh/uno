@@ -1,18 +1,17 @@
 def parse_data_args(data, args):
     missing_args = []
+    values = []
 
     for arg in args:
         if arg not in data:
             missing_args.append(arg)
+        else:
+            values.append(data[arg])
 
     if missing_args != []:
-        return (False, missing_args)
+        raise Exception(f'missing args: {", ".join(missing_args)}')
 
-    return (True, missing_args)
-
-
-def parse_notification(notification_type, message):
-    return {'type': notification_type, 'message': str(message)}
+    return values
 
 
 def parse_object_list(objects):

@@ -1,127 +1,124 @@
-from flask import Flask, request, jsonify
-from flask_socketio import SocketIO, emit, join_room, leave_room, send
-from flask_cors import CORS
-import json
-from uno import Game, Player
 import collections
+import json
 import logging
-from lib.notification import Notification
-from lib.parsers import parse_game_state, parse_object_list, parse_data_args
+
+import lib.env as env
 import lib.events as events
-import logging
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from flask_socketio import SocketIO, emit, join_room, leave_room, send
+from lib.notification import Notification
+from lib.parser import parse_data_args, parse_game_state, parse_object_list
+
+from uno import Game, Player
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
+# Server config
 app = Flask(__name__)
-app.logger.setLevel(logging.DEBUG)
-
+# TODO: restrict origin for production
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Game state
 rooms = collections.defaultdict(set)
 games = collections.defaultdict(Game)
 
 
 @socketio.on(events.PLAYER_JOIN)
 def on_join(data):
-    valid, missing_args = parse_data_args(data, ['name', 'room'])
-    if not valid:
-        log.error(f'missing args: {", ".join(missing_args)}')
-        return
+    try:
+        name, room = parse_data_args(data, ['name', 'room'])
 
-    name, room = data['name'], data['room']
+        player = Player(name)
+        players = rooms[room]
 
-    player = Player(name)
-    players = rooms[room]
+        players.add(player)
+        if env.ENVIRONMENT == "development":
+            # Add extra player for development
+            players.add(Player("developer"))
 
-    players.add(player)
-    players.add(Player("developer"))  # For development
-    join_room(room)
+        join_room(room)
 
-    log.info(f"{player} has joined the room {room}")
-    emit(events.GAME_ROOM, {
-         'players': parse_object_list(players)}, to=room)
+        log.info(f"{player} has joined the room {room}")
+        emit(events.GAME_ROOM, {
+            'players': parse_object_list(players)}, to=room)
+    except Exception as ex:
+        log.error(ex)
 
 
 @socketio.on(events.PLAYER_LEAVE)
 def on_leave(data):
-    # Throw error or something
-    valid, missing_args = parse_data_args(data, ['name', 'room'])
-    if not valid:
-        log.error(f'missing args: {", ".join(missing_args)}')
-        return
+    try:
+        name, room = parse_data_args(data, ['name', 'room'])
 
-    name, room = data['name'], data['room']
+        player = Player(name)
+        players = rooms[room]
 
-    player = Player(name)
-    players = rooms[room]
+        players.remove(player)
+        leave_room(room)
 
-    players.remove(player)
-    leave_room(room)
-
-    log.info(f"{player} has left the room {room}")
-    emit(events.GAME_ROOM, {'players': parse_object_list(players)}, to=room)
+        log.info(f"{player} has left the room {room}")
+        emit(events.GAME_ROOM, {
+             'players': parse_object_list(players)}, to=room)
+    except Exception as ex:
+        log.error(ex)
 
 
 @socketio.on(events.GAME_START)
 def on_new_game(data):
-    valid, missing_args = parse_data_args(data, ['room', 'hand_size'])
-    if not valid:
-        log.error(f'missing args: {", ".join(missing_args)}')
-        return
+    try:
+        room, hand_size = parse_data_args(data, ['room', 'hand_size'])
 
-    room, hand_size = data['room'], data['hand_size']
+        game = None
+        players = rooms[room]
 
-    game = None
-    players = rooms[room]
+        if room in games:  # Re-join an existing game
+            game = games[room]
+            log.info(f"rejoining existing game with players {game.players}")
 
-    if room in games:  # Re-join an existing game
-        game = games[room]
-        log.info(f"found an existing game with players {game.players}")
+        if not game:  # Start a new game
+            try:
+                game = Game(room, players, hand_size)
+                games[room] = game
+                log.info(f"starting a new game with {players}")
+            except Exception as ex:
+                Notification(room).error(ex)
+                return
 
-    if not game:  # Start a new game
-        try:
-            game = Game(room, players, hand_size)
-            games[room] = game
-            log.info(f"starting a new game with {players}")
-        except Exception as ex:
-            Notification(room).error(ex)
-            return
-
-    state = game.get_state()
-    emit(events.GAME_START, to=room)
-    emit(events.GAME_STATE, parse_game_state(state), to=room)
+        state = game.get_state()
+        emit(events.GAME_START, to=room)
+        emit(events.GAME_STATE, parse_game_state(state), to=room)
+    except Exception as ex:
+        log.error(ex)
 
 
 @socketio.on(events.GAME_DRAW)
 def on_draw_card(data):
-    valid, missing_args = parse_data_args(data, ['room', 'playerId'])
-    if not valid:
-        log.error(f'missing args: {", ".join(missing_args)}')
-        return
+    try:
+        room, playerId = parse_data_args(data, ['room', 'playerId'])
 
-    room, playerId = data['room'], data['playerId']
-
-    game = games[room]
-    game.draw(playerId)
-    state = game.get_state()
-    emit(events.GAME_STATE, parse_game_state(state), to=room)
+        game = games[room]
+        game.draw(playerId)
+        state = game.get_state()
+        emit(events.GAME_STATE, parse_game_state(state), to=room)
+    except Exception as ex:
+        log.error(ex)
 
 
 @socketio.on(events.GAME_PLAY)
 def on_play_game(data):
-    valid, missing_args = parse_data_args(data, ['room', 'playerId', 'cardId'])
-    if not valid:
-        log.error(f'missing args: {", ".join(missing_args)}')
-        return
+    try:
+        room, playerId, cardId = parse_data_args(
+            data, ['room', 'playerId', 'cardId'])
 
-    room, playerId, cardId = data['room'], data['playerId'], data['cardId']
-
-    game = games[room]
-    game.play(playerId, cardId)
-    state = game.get_state()
-    emit(events.GAME_STATE, parse_game_state(state), to=room)
+        game = games[room]
+        game.play(playerId, cardId)
+        state = game.get_state()
+        emit(events.GAME_STATE, parse_game_state(state), to=room)
+    except Exception as ex:
+        log.error(ex)
 
 
 if __name__ == '__main__':
