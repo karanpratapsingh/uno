@@ -68,8 +68,8 @@ function StartModal(props: StartModalProps): React.ReactElement {
       <input type='checkbox' id={`${action}-modal`} className='modal-toggle' />
       <div className='modal'>
         <div className='modal-box'>
-          <h3 className='text-lg font-bold'>{action}</h3>
-          <p className='py-4'>Let's start by entering some details</p>
+          <h3 className='text-2xl font-bold'>{action}</h3>
+          <p className='py-4'>{action} a game by entering some details</p>
           <Input
             label='Enter a name'
             value={name}

@@ -7,7 +7,7 @@
     "start": "vite",
     "dev": "vite --port 3000",
     "build": "tsc && vite build",
-    "serve": "vite preview",
+    "preview": "pnpm run build && vite preview --port 3000",
     "lint": "prettier --write ."
   },
   "dependencies": {

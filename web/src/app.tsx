@@ -1,15 +1,13 @@
-import React, { lazy } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './styles/global.css';
-
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Home from './pages/home';
+import Play from './pages/play';
+import Won from './pages/won';
+import './styles/global.css';
 import { Routes } from './types/routes';
-
-const Home = lazy(() => import('./pages/home'));
-const Play = lazy(() => import('./pages/play'));
-const Won = lazy(() => import('./pages/won'));
 
 const router = createBrowserRouter([
   {

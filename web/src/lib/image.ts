@@ -8,12 +8,14 @@ import { Card } from '../types/game';
  */
 export function getCardImageURL(card: Card, hidden?: boolean): string {
   if (hidden) {
-    return getAssetURL('../assets/images/cards/back.svg');
+    return new URL('../assets/images/cards/back.svg', import.meta.url).href;
   }
 
-  return getAssetURL(`../assets/images/cards/${card.color}/${card.value}.svg`);
+  return new URL(
+    `../assets/images/cards/${card.color}/${card.value}.svg`,
+    import.meta.url
+  ).href;
 }
 
-export function getAssetURL(relativePath: string): string {
-  return new URL(relativePath, import.meta.url).href;
-}
+export const logoURL = new URL('../assets/images/logo.svg', import.meta.url)
+  .href;

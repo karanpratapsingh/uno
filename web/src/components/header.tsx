@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io-client';
-import { getAssetURL } from '../lib/image';
+import { logoURL } from '../lib/image';
 import { GameConfig } from '../types/game';
 import InfoMenu from './menus/info';
 
@@ -9,8 +9,6 @@ interface HeaderProps {
   config: GameConfig;
   onLeave(): void;
 }
-
-const logoURL = getAssetURL('../assets/images/logo.svg');
 
 function Header(props: HeaderProps): React.ReactElement {
   const { isConnected, config, onLeave } = props;

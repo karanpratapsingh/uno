@@ -2,12 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import StartModal from '../components/modals/start';
 import { allowPlayer } from '../lib/api';
-import { getAssetURL } from '../lib/image';
+import { logoURL } from '../lib/image';
 import { maxHandSize, minHandSize } from '../lib/state';
 import { GameAction, GameConfig } from '../types/game';
 import { Routes } from '../types/routes';
-
-const logoURL = getAssetURL('../assets/images/logo.svg');
 
 function Home(): React.ReactElement {
   const navigate = useNavigate();
