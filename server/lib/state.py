@@ -3,7 +3,7 @@ import pickle
 from typing import Optional, Set
 
 from core.uno import Game, Player
-from lib.env import REDIS_HOST
+from lib.env import REDIS_URL
 from redis import Redis
 
 log = logging.getLogger('state')
@@ -15,7 +15,7 @@ ROOM_EXPIRATION_TIME = 86_400  # 1 day
 
 class State:
     def __init__(self):
-        self.redis = Redis(host=REDIS_HOST)
+        self.redis = Redis.from_url(REDIS_URL)
 
     def allow_player(self, action: str, room: str, player: Player) -> (bool, Optional[str]):
         # Validate player
