@@ -73,7 +73,7 @@ function StartModal(props: StartModalProps): React.ReactElement {
           <Input
             label='Enter a name'
             value={name}
-            placeholder='eg. kps99'
+            placeholder='eg. alex'
             onChange={onNameChange}
           />
           <Input

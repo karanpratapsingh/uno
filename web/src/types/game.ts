@@ -7,6 +7,7 @@ export enum Events {
   GAME_NOTIFY = 'game::notify',
   GAME_PLAY = 'game::play',
   GAME_DRAW = 'game::draw',
+  GAME_OVER = 'game::over',
   PLAYER_JOIN = 'player::join',
   PLAYER_LEAVE = 'player::leave',
 }

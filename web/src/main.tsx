@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Play from './pages/play';
 import Home from './pages/home';
+import Play from './pages/play';
+import Won from './pages/won';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Routes } from './types/routes';
-import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Routes } from './types/routes';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: Routes.Play,
     element: <Play />,
+  },
+  {
+    path: Routes.Won,
+    element: <Won />,
   },
 ]);
 

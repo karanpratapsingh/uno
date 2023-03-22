@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import { GAME_STATE_REFETCH_INTERVAL } from '../config/game';
 import { Card, Events, Hands, Player } from '../types/game';
-import { GameStateResponse } from '../types/ws';
+import { Routes } from '../types/routes';
+import {
+  GameOverReason,
+  GameOverResponse,
+  GameStateResponse
+} from '../types/ws';
 import Avatar from './avatar';
 import UnoCard from './uno-card';
 
@@ -16,6 +22,7 @@ interface GameProps {
 
 function Game(props: GameProps): React.ReactElement {
   const { socket, currentPlayer, players, started, room } = props;
+  const navigate = useNavigate();
 
   const [hands, setHands] = useState<Hands | null>(null);
   const [gameStack, setGameStack] = useState<Card[]>([]);
@@ -37,11 +44,23 @@ function Game(props: GameProps): React.ReactElement {
       setGameStack(data.game_stack);
       setRemainingCards(data.remaining_cards);
     }
-
     socket.on(Events.GAME_STATE, onGameState);
+
+    function onGameWon(data: GameOverResponse): void {
+      const { reason } = data;
+
+      switch (reason) {
+        case GameOverReason.Won:
+          const { winner } = data;
+          navigate(Routes.Won, { state: { winner } });
+          break;
+      }
+    }
+    socket.on(Events.GAME_OVER, onGameWon);
 
     return () => {
       socket.off(Events.GAME_STATE, onGameState);
+      socket.off(Events.GAME_OVER, onGameState);
     };
   }, []);
 

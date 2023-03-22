@@ -14,3 +14,19 @@ export type GameNotifyResponse = {
 export type GameRoomResponse = {
   players: Player[];
 };
+
+export enum GameOverReason {
+  Won = 'won',
+  Error = 'error',
+}
+
+export type GameOverResponse = GameOverWonResponse | GameOverErrorResponse;
+
+type GameOverWonResponse = {
+  reason: GameOverReason.Won;
+  winner: string;
+};
+
+type GameOverErrorResponse = {
+  reason: GameOverReason.Error;
+};
