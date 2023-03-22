@@ -10,7 +10,7 @@ import {
   GameStateResponse,
 } from '../types/ws';
 import Avatar from './avatar';
-import UnoCard from './uno-card';
+import UnoCard from './cards/uno';
 
 interface GameProps {
   currentPlayer: Player;

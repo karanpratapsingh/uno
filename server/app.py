@@ -32,6 +32,7 @@ def allow_player():
         action, name, room = parse_data_args(request.json, ['action', 'name', 'room'])
         player = Player(name)
         allow, reason = state.allow_player(action, room, player)
+
         return {'allow': allow, 'reason': reason}
     except Exception as ex:
         log.error(ex)
