@@ -4,7 +4,7 @@ import { getCardImageURL } from '../../lib/image';
 import { Card, Player } from '../../types/game';
 
 interface UnoCardProps {
-  currentPlayer: Player;
+  currentPlayer?: Player;
   card: Card;
   hidden?: boolean;
   disableClick?: boolean;
@@ -20,8 +20,11 @@ function UnoCard(props: UnoCardProps): React.ReactElement {
     onClick,
   } = props;
 
-  const allowPlay = !disableClick && onClick;
-  const imageSrc = useMemo(() => getCardImageURL(card, hidden), [card, hidden]);
+  const allowPlay = !disableClick && onClick && currentPlayer;
+  const imageSrc = useMemo(
+    () => getCardImageURL(card, hidden),
+    [card.id, hidden]
+  );
 
   return (
     <button

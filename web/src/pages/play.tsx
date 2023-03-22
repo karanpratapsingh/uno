@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import Avatar from '../components/avatar';
 import Game from '../components/game';
 import Header from '../components/header';
+import Loader from '../components/loader';
 import socket from '../lib/socket';
 import { defaultHandSize, validateGameConfig } from '../lib/state';
 import { Events, GameAction, GameConfig, Player } from '../types/game';
@@ -162,16 +163,7 @@ function Play(): React.ReactElement {
         onLeave={onLeave}
         config={config}
       />
-      {isConnected ? (
-        content
-      ) : (
-        <div className='flex flex-1 flex-col items-center justify-center'>
-          <div className='loader' />
-          <span className='mt-8 text-center text-xl italic text-gray-500'>
-            Connecting...
-          </span>
-        </div>
-      )}
+      {isConnected ? content : <Loader label='Connecting...' />}
     </div>
   );
 }

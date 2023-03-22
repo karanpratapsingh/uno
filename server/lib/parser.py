@@ -17,20 +17,21 @@ def parse_data_args(data: Dict[str, Any], args: List[str]) -> List[Any]:
     return values
 
 
+def parse_object(obj) -> Any:
+    return obj.__dict__
+
+
 def parse_object_list(objects) -> List[Any]:
     return [obj.__dict__ for obj in list(objects)]
 
 
 def parse_game_state(state) -> Dict[str, Any]:
-    (hands, remaining_cards, game_stack) = state
+    (hands, top_card) = state
     parsed_hands = {key.id: parse_object_list(
         value) for key, value in hands.items()}
-
-    parsed_remaining_cards = parse_object_list(remaining_cards)
-    parsed_game_stack = parse_object_list(game_stack)
+    parsed_top_card = parse_object(top_card)
 
     return {
         'hands': parsed_hands,
-        'remaining_cards': parsed_remaining_cards,
-        'game_stack': parsed_game_stack
+        'top_card': parsed_top_card
     }

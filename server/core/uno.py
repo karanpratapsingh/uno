@@ -80,6 +80,7 @@ class Deck:
 class GameOverReason(Enum):
     WON = 'won'
     ERROR = 'error'
+    # PLAYERS_LEFT = 'players-left' TODO: Redirect to room when insufficient players
 
 
 class Game:
@@ -114,8 +115,12 @@ class Game:
 
         self.game_stack: List[Card] = [top_card]
 
-    def get_state(self) -> Tuple[Any]:
-        return (self.hands, self.remaining_cards, self.game_stack)
+    def get_state(self) -> Tuple[DefaultDict[Player, List[Card]], Card]:
+        top_card = self.get_top_card()
+        return (self.hands, top_card)
+
+    def get_top_card(self):
+        return self.game_stack[-1]
 
     def draw(self, playerId) -> None:
         player = self.find_object(self.players, playerId)
@@ -128,7 +133,7 @@ class Game:
         player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
         card = self.find_object(player_cards, cardId)
-        top_card = self.game_stack[0]
+        top_card = self.get_top_card()
 
         def execute_hand():
             nonlocal player_cards, card
@@ -138,7 +143,7 @@ class Game:
             player_cards.pop(idx)
 
             # Insert played card top of the game stack
-            self.game_stack.insert(0, card)
+            self.game_stack.append(card)
 
             if len(player_cards) == 1:
                 self.notify.success(f"UNO! by {player.name}")

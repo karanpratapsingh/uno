@@ -2,8 +2,7 @@ import { Card, Hands, Player } from './game';
 
 export type GameStateResponse = {
   hands: Hands;
-  game_stack: Card[];
-  remaining_cards: Card[];
+  top_card: Card;
 };
 
 export type GameNotifyResponse = {

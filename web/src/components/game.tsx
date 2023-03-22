@@ -10,7 +10,9 @@ import {
   GameStateResponse,
 } from '../types/ws';
 import Avatar from './avatar';
+import CardStack from './cards/stack';
 import UnoCard from './cards/uno';
+import Loader from './loader';
 
 interface GameProps {
   currentPlayer: Player;
@@ -25,8 +27,7 @@ function Game(props: GameProps): React.ReactElement {
   const navigate = useNavigate();
 
   const [hands, setHands] = useState<Hands | null>(null);
-  const [gameStack, setGameStack] = useState<Card[]>([]);
-  const [remainingCards, setRemainingCards] = useState<Card[]>([]);
+  const [topCard, setTopCard] = useState<Card | null>(null);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -39,10 +40,17 @@ function Game(props: GameProps): React.ReactElement {
   }, []);
 
   useEffect(() => {
+    const listener = (eventName: any, ...args: any) => {
+      console.log(eventName, args);
+    };
+
+    socket.onAny(listener);
+  }, []);
+
+  useEffect(() => {
     function onGameState(data: GameStateResponse): void {
       setHands(data.hands);
-      setGameStack(data.game_stack);
-      setRemainingCards(data.remaining_cards);
+      setTopCard(data.top_card);
     }
     socket.on(Events.GAME_STATE, onGameState);
 
@@ -72,11 +80,10 @@ function Game(props: GameProps): React.ReactElement {
     socket.emit(Events.GAME_DRAW, { playerId: currentPlayer.id, room });
   }
 
-  const gameActive =
-    started && hands && gameStack.length && remainingCards.length;
+  const gameLoaded = started && hands && topCard && players.length > 1;
 
-  if (!gameActive) {
-    return <></>;
+  if (!gameLoaded) {
+    return <Loader label='Loading game...' />;
   }
 
   const [otherPlayer] = players.filter(p => p.id !== currentPlayer.id);
@@ -110,28 +117,10 @@ function Game(props: GameProps): React.ReactElement {
       {/* Card space */}
       <div className='flex flex-1 items-center justify-center'>
         <div className='flex flex-1 justify-center'>
-          <div className='stack' onClick={drawCard}>
-            {remainingCards.map((card: Card) => (
-              <UnoCard
-                key={card.id}
-                currentPlayer={currentPlayer}
-                card={card}
-                hidden
-              />
-            ))}
-          </div>
+          <CardStack onClick={drawCard} hidden />
         </div>
         <div className='flex flex-1'>
-          <div className='stack'>
-            {gameStack.map((card: Card) => (
-              <UnoCard
-                key={card.id}
-                currentPlayer={currentPlayer}
-                card={card}
-                disableClick
-              />
-            ))}
-          </div>
+          <CardStack card={topCard} />
         </div>
       </div>
 
