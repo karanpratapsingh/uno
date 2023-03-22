@@ -7,7 +7,7 @@ import { Routes } from '../types/routes';
 import {
   GameOverReason,
   GameOverResponse,
-  GameStateResponse
+  GameStateResponse,
 } from '../types/ws';
 import Avatar from './avatar';
 import UnoCard from './uno-card';

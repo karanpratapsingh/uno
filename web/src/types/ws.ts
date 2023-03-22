@@ -1,4 +1,4 @@
-import { Hands, Card, Player } from './game';
+import { Card, Hands, Player } from './game';
 
 export type GameStateResponse = {
   hands: Hands;
