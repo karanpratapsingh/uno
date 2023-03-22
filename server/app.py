@@ -1,11 +1,11 @@
 import collections
 import json
 import logging
-from typing import DefaultDict, Set
+from typing import Any, DefaultDict, Set
 
 import lib.env as env
 import lib.events as events
-from core.uno import Game, Player
+from core.uno import Game, GameOverReason, Player
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
@@ -13,14 +13,13 @@ from lib.notification import Notification
 from lib.parser import parse_data_args, parse_game_state, parse_object_list
 from lib.state import State
 
+logging.basicConfig(format='%(levelname)s[%(name)s]: %(message)s')
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 # Server config
-app = Flask(__name__)
-app.logger.setLevel(logging.DEBUG)
-
 # TODO: restrict origin for production
+app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -52,7 +51,7 @@ def on_join(data):
         # Add extra player for development
         if env.ENVIRONMENT == "development":
             dev_player = Player("developer")
-            # state.add_player_to_room(room, dev_player)
+            state.add_player_to_room(room, dev_player)
 
         players = state.get_players_by_room(room)
         emit(events.GAME_ROOM, {'players': parse_object_list(players)}, to=room)
@@ -121,7 +120,17 @@ def on_play_game(data):
         room, playerId, cardId = parse_data_args(data, ['room', 'playerId', 'cardId'])
 
         game = state.get_game_by_room(room)
-        game.play(playerId, cardId)
+
+        def on_game_over(reason: GameOverReason, data: Any):
+            nonlocal room
+
+            if reason == GameOverReason.WON:
+                log.info(f'player {data} won game {room}')
+                emit(events.GAME_OVER, {'reason': reason.value, 'winner': data.name}, to=room)
+            state.cleanup(room)
+
+        game.play(playerId, cardId, on_game_over)
+
         game_state = game.get_state()
         emit(events.GAME_STATE, parse_game_state(game_state), to=room)
         state.update_game_in_room(room, game)
@@ -143,4 +152,4 @@ def on_game_state(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5000)
+    socketio.run(app, port=5000)

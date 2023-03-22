@@ -1,13 +1,10 @@
 import collections
 import json
-import logging
 import random
+from enum import Enum
 from typing import Any, DefaultDict, List, Tuple
 
 from lib.notification import Notification
-
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 
 class Player:
@@ -80,6 +77,11 @@ class Deck:
             random.shuffle(self.cards)
 
 
+class GameOverReason(Enum):
+    WON = 'won'
+    ERROR = 'error'
+
+
 class Game:
     def __init__(self, room,  players, hand_size):
         self.hands: DefaultDict[Player, List[Card]] = collections.defaultdict(list)
@@ -122,7 +124,7 @@ class Game:
         new_card = self.remaining_cards.pop()
         player_cards.append(new_card)
 
-    def play(self, playerId, cardId) -> None:
+    def play(self, playerId, cardId, on_game_over) -> None:
         player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
         card = self.find_object(player_cards, cardId)
@@ -139,7 +141,10 @@ class Game:
             self.game_stack.insert(0, card)
 
             if len(player_cards) == 1:
-                self.notify.success(f"UNO!")
+                self.notify.success(f"UNO! by {player.name}")
+
+            if len(player_cards) == 0:
+                on_game_over(GameOverReason.WON, player)
 
         # Can play any card on top of black cards
         if not card.is_black() and top_card.is_black():

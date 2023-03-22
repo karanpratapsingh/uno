@@ -6,8 +6,8 @@ from core.uno import Game, Player
 from lib.env import REDIS_HOST
 from redis import Redis
 
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log = logging.getLogger('state')
+log.setLevel(logging.INFO)
 
 GAME_EXPIRATION_TIME = 86_400  # 1 day
 ROOM_EXPIRATION_TIME = 86_400  # 1 day
@@ -86,3 +86,8 @@ class State:
 
         obj = pickle.dumps(players)
         self.redis.set(f'players_{room}', obj, ex=ROOM_EXPIRATION_TIME)
+
+    def cleanup(self, room: str) -> None:
+        log.info(f"room {room} clean up complete")
+        self.redis.delete(f'players_{room}')
+        self.redis.delete(f'game_{room}')
