@@ -2,3 +2,5 @@ flask==2.2.3
 Flask-SocketIO==5.3.3
 Flask-Cors==3.0.10
 redis==4.5.2
+gunicorn==20.1.0
+eventlet==0.30.2

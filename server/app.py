@@ -6,7 +6,7 @@ from typing import Any, DefaultDict, Set
 import lib.env as env
 import lib.events as events
 from core.uno import Game, GameOverReason, Player
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from lib.notification import Notification
@@ -24,6 +24,11 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 state = State()
+
+
+@app.get('/healthz')
+def healthcheck():
+    return Response(status=200)
 
 
 @app.post('/api/game/allow')
@@ -153,4 +158,4 @@ def on_game_state(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, port=5000)
+    socketio.run(app, host="0.0.0.0", port=5000)
