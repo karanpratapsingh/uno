@@ -25,7 +25,7 @@ function Header(props: HeaderProps): React.ReactElement {
         </div>
         <div className='navbar-end'>
           <label
-            className='btn-ghost btn-sm btn text-red-400'
+            className='btn-ghost btn text-red-400'
             htmlFor='confirm-leave-modal'
           >
             Leave

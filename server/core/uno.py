@@ -156,7 +156,7 @@ class Game:
             if ((card.is_draw_four() and top_card.is_wild()) or
                     (card.is_wild() and top_card.is_draw_four())):
                 self.notify.error(
-                    f"cannot play a {card.value} card top of a {top_card.value} card")
+                    f"cannot play a {card.value} card on top of a {top_card.value} card")
                 return
             execute_hand()
             return

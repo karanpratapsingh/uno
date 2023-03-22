@@ -20,7 +20,7 @@ function Won(): React.ReactElement {
   return (
     <div className='flex h-full w-full flex-col items-center justify-center'>
       <Confetti />
-      <p className='text-4xl font-bold'>{state?.winner} won! 🎉</p>
+      <p className='text-6xl mb-8'>{state?.winner} won! 🎉</p>
       <button onClick={onPlayAgain} className='btn mt-8'>
         Play again
       </button>
