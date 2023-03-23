@@ -15,7 +15,7 @@ interface UnoCardProps {
 
 export const cardSizes: Record<UnoCardSizes, string> = {
   default: 'h-36 w-20 md:h-44 md:w-28',
-  large: 'h-44 w-28 md:h-48 md:w-32',
+  large: 'h-40 w-24 md:h-48 md:w-32',
 };
 
 function UnoCard(props: UnoCardProps): React.ReactElement {
