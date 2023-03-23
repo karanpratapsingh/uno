@@ -1,0 +1,2 @@
+User-agent: AdsBot-Google
+Disallow: /
