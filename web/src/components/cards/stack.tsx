@@ -10,6 +10,7 @@ interface CardStackProps {
 
 function CardStack(props: CardStackProps): React.ReactElement {
   const { card, hidden, onClick } = props;
+
   return (
     <div className='stack' onClick={() => onClick && onClick()}>
       {card && <UnoCard card={card} hidden={hidden} />}

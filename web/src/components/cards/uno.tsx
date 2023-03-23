@@ -4,23 +4,16 @@ import { getCardImageURL } from '../../lib/image';
 import { Card, Player } from '../../types/game';
 
 interface UnoCardProps {
-  currentPlayer?: Player;
   card: Card;
+  currentPlayer?: Player;
   hidden?: boolean;
-  disableClick?: boolean;
   onClick?(playerId: string, cardId: string): void;
 }
 
 function UnoCard(props: UnoCardProps): React.ReactElement {
-  const {
-    currentPlayer,
-    card,
-    hidden = false,
-    disableClick = false,
-    onClick,
-  } = props;
+  const { currentPlayer, card, hidden = false, onClick } = props;
 
-  const allowPlay = !disableClick && onClick && currentPlayer;
+  const allowPlay = onClick && currentPlayer;
   const imageSrc = useMemo(
     () => getCardImageURL(card, hidden),
     [card.id, hidden]
@@ -30,7 +23,7 @@ function UnoCard(props: UnoCardProps): React.ReactElement {
     <button
       onClick={() => allowPlay && onClick(currentPlayer.id, card.id)}
       className={`mr-4 flex h-48 items-center justify-center rounded ${clsx(
-        disableClick && 'no-pointer'
+        !onClick && 'no-pointer'
       )}`}
     >
       <span className='text-xl'>

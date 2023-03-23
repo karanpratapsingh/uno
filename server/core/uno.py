@@ -2,7 +2,7 @@ import collections
 import json
 import random
 from enum import Enum
-from typing import Any, DefaultDict, List, Set, Tuple
+from typing import Any, Callable, DefaultDict, List, Set, Tuple
 
 from lib.notification import Notification
 
@@ -104,8 +104,7 @@ class Game:
         cards = self.deck.get_cards()
 
         TOTAL_PLAYERS = len(players)
-        self.remaining_cards: List[Card] = cards[(
-            TOTAL_PLAYERS * hand_size) + 1:]
+        self.remaining_cards: List[Card] = cards[TOTAL_PLAYERS * hand_size:]
         player_cards = cards[:TOTAL_PLAYERS * hand_size]
 
         # Distribute cards (alternatively)
@@ -125,12 +124,13 @@ class Game:
     def get_state(self) -> Tuple[DefaultDict[Player, List[Card]], Card]:
         self.validate_players()
         top_card = self.get_top_card()
+
         return (self.hands, top_card)
 
     def get_top_card(self):
         return self.game_stack[-1]
 
-    def draw(self, playerId) -> None:
+    def draw(self, playerId: str) -> None:
         self.validate_players()
 
         player = self.find_object(self.players, playerId)
@@ -139,7 +139,7 @@ class Game:
         new_card = self.remaining_cards.pop()
         player_cards.append(new_card)
 
-    def play(self, playerId, cardId, on_game_over) -> None:
+    def play(self, playerId: str, cardId: str, on_game_over: Callable[[GameOverReason, Any], None]) -> None:
         self.validate_players()
 
         player = self.find_object(self.players, playerId)
@@ -185,18 +185,15 @@ class Game:
             execute_hand()
             return
 
-        if same_color and card.is_color_special():
-            execute_hand()
-            return
-
         if card.is_black():
             execute_hand()
             return
 
-    def find_object(self, objects, id):
+    def find_object(self, objects, id: str):
         objects = list(objects)
         idx = self.find_object_idx(objects, id)
+
         return objects[idx]
 
-    def find_object_idx(self, objects, id):
+    def find_object_idx(self, objects, id: str):
         return [obj.id for obj in objects].index(id)

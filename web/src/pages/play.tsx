@@ -5,9 +5,10 @@ import Avatar from '../components/avatar';
 import Game from '../components/game';
 import Header from '../components/header';
 import Loader from '../components/loader';
+import { defaultConfig } from '../config/game';
 import socket from '../lib/socket';
-import { defaultHandSize, validateGameConfig } from '../lib/state';
-import { Events, GameAction, GameConfig, Player } from '../types/game';
+import { validateGameConfig } from '../lib/state';
+import { Events, GameConfig, Player } from '../types/game';
 import { Routes } from '../types/routes';
 import { GameNotifyResponse, GameRoomResponse } from '../types/ws';
 
@@ -19,7 +20,7 @@ function Play(): React.ReactElement {
   useEffect(() => {
     if (!isValidState) {
       navigate(Routes.Home);
-      toast.warn('No active game found, please host or join a game');
+      toast.warn('no active game found, please host or join a game');
     }
   }, [isValidState]);
 
@@ -29,17 +30,19 @@ function Play(): React.ReactElement {
   const [players, setPlayers] = useState<Player[]>([]);
   const config = useMemo<GameConfig>(
     () => ({
-      action: state?.action || GameAction.Join,
-      name: state?.name || '',
-      room: state?.room || '',
-      hand_size: state?.hand_size || defaultHandSize,
+      action: state?.action || defaultConfig.action,
+      name: state?.name || defaultConfig.name,
+      room: state?.room || defaultConfig.room,
+      hand_size: state?.hand_size || defaultConfig.hand_size,
     }),
     [state]
   );
 
   useEffect(() => {
     const { name, room } = config;
-    socket.emit(Events.PLAYER_JOIN, { name, room });
+    if (name !== defaultConfig.name && room !== defaultConfig.room) {
+      socket.emit(Events.PLAYER_JOIN, { name, room });
+    }
   }, [config]);
 
   useEffect(() => {

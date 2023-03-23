@@ -102,10 +102,9 @@ function Game(props: GameProps): React.ReactElement {
           {otherCards.map((card: Card) => (
             <UnoCard
               key={card.id}
-              currentPlayer={currentPlayer}
               card={card}
+              currentPlayer={currentPlayer}
               hidden
-              disableClick
             />
           ))}
         </div>
@@ -126,8 +125,9 @@ function Game(props: GameProps): React.ReactElement {
         <div className='flex'>
           {ownCards.map((card: Card) => (
             <UnoCard
-              currentPlayer={currentPlayer}
+              key={card.id}
               card={card}
+              currentPlayer={currentPlayer}
               onClick={playCard}
             />
           ))}
