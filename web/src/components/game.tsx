@@ -40,21 +40,13 @@ function Game(props: GameProps): React.ReactElement {
   }, []);
 
   useEffect(() => {
-    const listener = (eventName: any, ...args: any) => {
-      console.log(eventName, args);
-    };
-
-    socket.onAny(listener);
-  }, []);
-
-  useEffect(() => {
     function onGameState(data: GameStateResponse): void {
       setHands(data.hands);
       setTopCard(data.top_card);
     }
     socket.on(Events.GAME_STATE, onGameState);
 
-    function onGameWon(data: GameOverResponse): void {
+    function onGameOver(data: GameOverResponse): void {
       const { reason } = data;
 
       switch (reason) {
@@ -62,9 +54,14 @@ function Game(props: GameProps): React.ReactElement {
           const { winner } = data;
           navigate(Routes.Won, { state: { winner } });
           break;
+        case GameOverReason.InsufficientPlayers:
+          setTimeout(() => {
+            navigate(0); // Refresh
+          }, 5000);
+          break;
       }
     }
-    socket.on(Events.GAME_OVER, onGameWon);
+    socket.on(Events.GAME_OVER, onGameOver);
 
     return () => {
       socket.off(Events.GAME_STATE, onGameState);

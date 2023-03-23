@@ -2,7 +2,7 @@ import collections
 import json
 import random
 from enum import Enum
-from typing import Any, DefaultDict, List, Tuple
+from typing import Any, DefaultDict, List, Set, Tuple
 
 from lib.notification import Notification
 
@@ -80,19 +80,26 @@ class Deck:
 class GameOverReason(Enum):
     WON = 'won'
     ERROR = 'error'
-    # PLAYERS_LEFT = 'players-left' TODO: Redirect to room when insufficient players
+    INSUFFICIENT_PLAYERS = 'insufficient-players'
 
 
 class Game:
-    def __init__(self, room,  players, hand_size):
-        self.hands: DefaultDict[Player, List[Card]] = collections.defaultdict(list)
-        self.players: List[Player] = list(players)
-        self.notify = Notification(room)
-        self.deck = Deck()
 
+    def remove_player(self, player) -> None:
+        self.players.remove(player)
+
+    def validate_players(self) -> None:
         if len(self.players) < 2:
             raise Exception("need at least 2 players to start the game")
             return
+
+    def __init__(self, room: str, players: Set[Player], hand_size: int):
+        self.hands: DefaultDict[Player, List[Card]] = collections.defaultdict(list)
+        self.players: Set[Player] = players
+        self.notify = Notification(room)
+        self.deck = Deck()
+
+        self.validate_players()
 
         cards = self.deck.get_cards()
 
@@ -116,6 +123,7 @@ class Game:
         self.game_stack: List[Card] = [top_card]
 
     def get_state(self) -> Tuple[DefaultDict[Player, List[Card]], Card]:
+        self.validate_players()
         top_card = self.get_top_card()
         return (self.hands, top_card)
 
@@ -123,6 +131,8 @@ class Game:
         return self.game_stack[-1]
 
     def draw(self, playerId) -> None:
+        self.validate_players()
+
         player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
 
@@ -130,6 +140,8 @@ class Game:
         player_cards.append(new_card)
 
     def play(self, playerId, cardId, on_game_over) -> None:
+        self.validate_players()
+
         player = self.find_object(self.players, playerId)
         player_cards = self.hands[player]
         card = self.find_object(player_cards, cardId)
@@ -182,6 +194,7 @@ class Game:
             return
 
     def find_object(self, objects, id):
+        objects = list(objects)
         idx = self.find_object_idx(objects, id)
         return objects[idx]
 

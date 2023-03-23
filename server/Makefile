@@ -10,3 +10,6 @@ install:
 
 dev:
 	flask --app app --debug run
+
+debug:
+	ENVIRONMENT=debug flask --app app --debug run

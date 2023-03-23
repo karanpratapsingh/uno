@@ -87,7 +87,14 @@ class State:
         obj = pickle.dumps(players)
         self.redis.set(f'players_{room}', obj, ex=ROOM_EXPIRATION_TIME)
 
-    def cleanup(self, room: str) -> None:
-        log.info(f"room {room} clean up complete")
+    def delete_all(self, room: str) -> None:
+        self.delete_room(room)
+        self.delete_game(room)
+
+    def delete_room(self, room: str) -> None:
         self.redis.delete(f'players_{room}')
+        log.info(f"deleted {room}")
+
+    def delete_game(self, room: str) -> None:
         self.redis.delete(f'game_{room}')
+        log.info(f"deleted game for room {room}")

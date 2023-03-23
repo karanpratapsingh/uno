@@ -17,9 +17,13 @@ export type GameRoomResponse = {
 export enum GameOverReason {
   Won = 'won',
   Error = 'error',
+  InsufficientPlayers = 'insufficient-players',
 }
 
-export type GameOverResponse = GameOverWonResponse | GameOverErrorResponse;
+export type GameOverResponse =
+  | GameOverWonResponse
+  | GameOverErrorResponse
+  | GameOverInsufficientPlayersResponse;
 
 type GameOverWonResponse = {
   reason: GameOverReason.Won;
@@ -28,4 +32,8 @@ type GameOverWonResponse = {
 
 type GameOverErrorResponse = {
   reason: GameOverReason.Error;
+};
+
+type GameOverInsufficientPlayersResponse = {
+  reason: GameOverReason.InsufficientPlayers;
 };
