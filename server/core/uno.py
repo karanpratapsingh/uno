@@ -1,5 +1,4 @@
 import collections
-import json
 import random
 from enum import Enum
 from typing import Any, Callable, DefaultDict, List, Set, Tuple
@@ -129,21 +128,21 @@ class Game:
     def get_top_card(self):
         return self.game_stack[-1]
 
-    def draw(self, playerId: str) -> None:
+    def draw(self, player_id: str) -> None:
         self.validate_players()
 
-        player = self.find_object(self.players, playerId)
+        player = self.find_object(self.players, player_id)
         player_cards = self.hands[player]
 
         new_card = self.remaining_cards.pop()
         player_cards.append(new_card)
 
-    def play(self, playerId: str, cardId: str, on_game_over: Callable[[GameOverReason, Any], None]) -> None:
+    def play(self, player_id: str, card_id: str, on_game_over: Callable[[GameOverReason, Any], None]) -> None:
         self.validate_players()
 
-        player = self.find_object(self.players, playerId)
+        player = self.find_object(self.players, player_id)
         player_cards = self.hands[player]
-        card = self.find_object(player_cards, cardId)
+        card = self.find_object(player_cards, card_id)
         top_card = self.get_top_card()
 
         def execute_hand():
@@ -188,11 +187,11 @@ class Game:
             execute_hand()
             return
 
-    def find_object(self, objects, id: str):
+    def find_object(self, objects, obj_id: str):
         objects = list(objects)
-        idx = self.find_object_idx(objects, id)
+        idx = self.find_object_idx(objects, obj_id)
 
         return objects[idx]
 
-    def find_object_idx(self, objects, id: str):
-        return [obj.id for obj in objects].index(id)
+    def find_object_idx(self, objects, obj_id: str):
+        return [obj.id for obj in objects].index(obj_id)

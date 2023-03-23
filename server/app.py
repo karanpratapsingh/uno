@@ -1,14 +1,13 @@
-import collections
-import json
 import logging
-from typing import Any, DefaultDict, Set
+from typing import Any
 
-import lib.env as env
-import lib.events as events
-from core.uno import Game, GameOverReason, Player
-from flask import Flask, Response, jsonify, request
+from flask import Flask, Response, request
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit, join_room, leave_room, send
+from flask_socketio import SocketIO, emit, join_room, leave_room
+
+from lib import env
+from lib import events
+from core.uno import Game, GameOverReason, Player
 from lib.notification import Notification
 from lib.parser import parse_data_args, parse_game_state, parse_object_list
 from lib.state import State
@@ -134,10 +133,10 @@ def on_game_start(data):
 @socketio.on(events.GAME_DRAW)
 def on_draw_card(data):
     try:
-        room, playerId = parse_data_args(data, ['room', 'playerId'])
+        room, player_id = parse_data_args(data, ['room', 'player_id'])
 
         game = state.get_game_by_room(room)
-        game.draw(playerId)
+        game.draw(player_id)
         game_state = game.get_state()
         emit(events.GAME_STATE, parse_game_state(game_state), to=room)
         state.update_game_in_room(room, game)
@@ -148,7 +147,7 @@ def on_draw_card(data):
 @socketio.on(events.GAME_PLAY)
 def on_play_game(data):
     try:
-        room, playerId, cardId = parse_data_args(data, ['room', 'playerId', 'cardId'])
+        room, player_id, card_id = parse_data_args(data, ['room', 'player_id', 'card_id'])
 
         game = state.get_game_by_room(room)
 
@@ -160,7 +159,7 @@ def on_play_game(data):
                 emit(events.GAME_OVER, {'reason': reason.value, 'winner': data.name}, to=room)
             state.delete_all(room)
 
-        game.play(playerId, cardId, on_game_over)
+        game.play(player_id, card_id, on_game_over)
 
         game_state = game.get_state()
         emit(events.GAME_STATE, parse_game_state(game_state), to=room)
@@ -172,7 +171,7 @@ def on_play_game(data):
 @socketio.on(events.GAME_STATE)
 def on_game_state(data):
     try:
-        room, = parse_data_args(data, ['room'])
+        room = parse_data_args(data, ['room'])[0]
 
         game = state.get_game_by_room(room)
         if game:
