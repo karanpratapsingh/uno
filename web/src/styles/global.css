@@ -15,7 +15,8 @@ body {
 }
 
 #root {
-  height: 100vh;
+  display: flex;
+  height: 100dvh;
   width: 100vw;
 }
 

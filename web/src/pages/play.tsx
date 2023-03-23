@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { RiShareForwardFill } from 'react-icons/ri';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Avatar from '../components/avatar';
@@ -6,6 +7,7 @@ import Game from '../components/game';
 import Header from '../components/header';
 import Loader from '../components/loader';
 import { defaultConfig } from '../config/game';
+import { WEB_HTTP_URL } from '../config/web';
 import socket from '../lib/socket';
 import { validateGameConfig } from '../lib/state';
 import { Events, GameConfig, Player } from '../types/game';
@@ -123,6 +125,20 @@ function Play(): React.ReactElement {
     navigate(Routes.Home);
   }
 
+  async function onCopyLink(): Promise<void> {
+    const url = `${WEB_HTTP_URL}?join=${config.room}`;
+
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+      toast.success('copied url to the clipboard');
+    } else {
+      toast.error(`cannot copy to the clipboard, use url ${url}`, {
+        draggable: false,
+        closeOnClick: false,
+      });
+    }
+  }
+
   let content: React.ReactNode = null;
   const currentPlayer = players.find(player => player.name == config.name);
 
@@ -151,8 +167,12 @@ function Play(): React.ReactElement {
           ))}
         </div>
         <span className='mt-6 text-xl italic text-gray-500'>{status}</span>
-        <button onClick={onGameStart} className='btn-wide btn mt-8'>
+        <button onClick={onGameStart} className='btn-wide btn mt-8 mb-4'>
           Start
+        </button>
+        <button onClick={onCopyLink} className='btn-wide btn-ghost btn text-sm'>
+          <RiShareForwardFill className='mr-2' />
+          copy link
         </button>
       </div>
     );

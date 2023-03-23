@@ -91,49 +91,59 @@ function Game(props: GameProps): React.ReactElement {
   return (
     <div className='flex flex-1 flex-col'>
       {/* Other player */}
-      <div className='flex flex-col items-center justify-center'>
+      <div className='flex flex-1 flex-col justify-center'>
         <Avatar
-          className='my-4'
+          className='self-center my-4'
           name={otherPlayer.name}
           size='small'
           type='row'
         />
-        <div className='flex'>
-          {otherCards.map((card: Card) => (
-            <UnoCard
-              key={card.id}
-              card={card}
-              currentPlayer={currentPlayer}
-              hidden
-            />
-          ))}
+
+        <div className='flex flex-1 overflow-x-scroll items-center justify-center'>
+          <div className='flex'>
+            {otherCards.map((card: Card) => (
+              <UnoCard
+                key={card.id}
+                card={card}
+                currentPlayer={currentPlayer}
+                hidden
+              />
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Card space */}
-      <div className='flex flex-1 items-center justify-center'>
-        <div className='flex flex-1 justify-center'>
-          <CardStack onClick={drawCard} hidden />
-        </div>
-        <div className='flex flex-1'>
-          <CardStack card={topCard} />
-        </div>
+      <div className='flex flex-1 items-center justify-center my-8 lg:my-0'>
+        <CardStack
+          className='mr-2 md:mr-12 lg:mr-24'
+          size='large'
+          onClick={drawCard}
+          hidden
+        />
+        <CardStack
+          className='ml-2 md:ml-12 lg:ml-24'
+          size='large'
+          card={topCard}
+        />
       </div>
 
       {/* Current Player */}
-      <div className='flex flex-col items-center justify-center'>
-        <div className='flex'>
-          {ownCards.map((card: Card) => (
-            <UnoCard
-              key={card.id}
-              card={card}
-              currentPlayer={currentPlayer}
-              onClick={playCard}
-            />
-          ))}
+      <div className='flex flex-1 flex-col justify-center'>
+        <div className='flex flex-1 overflow-x-scroll items-center justify-center'>
+          <div className='flex'>
+            {ownCards.map((card: Card) => (
+              <UnoCard
+                key={card.id}
+                card={card}
+                currentPlayer={currentPlayer}
+                onClick={playCard}
+              />
+            ))}
+          </div>
         </div>
         <Avatar
-          className='mt-4'
+          className='self-center my-4 lg:mb-0'
           name={currentPlayer.name}
           size='small'
           type='row'

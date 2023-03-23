@@ -1,19 +1,22 @@
+import clsx from 'clsx';
 import { useMemo } from 'react';
 import { getBlankCardURL } from '../../lib/image';
+import { cardSizes, UnoCardSizes } from './uno';
 
 interface BlankCardProps {
+  size?: UnoCardSizes;
   hidden?: boolean;
 }
 
 function BlankCard(props: BlankCardProps): React.ReactElement {
-  const { hidden } = props;
+  const { size = 'default', hidden } = props;
   const imageSrc = useMemo(() => getBlankCardURL(hidden), []);
 
   return (
-    <button className={'mr-4 flex h-48 items-center justify-center rounded'}>
-      <span className='text-xl'>
-        <img className='h-48 border-gray-400' src={imageSrc} alt='blank card' />
-      </span>
+    <button
+      className={clsx('mr-4 flex items-center justify-center', cardSizes[size])}
+    >
+      <img src={imageSrc} alt='blank card' />
     </button>
   );
 }

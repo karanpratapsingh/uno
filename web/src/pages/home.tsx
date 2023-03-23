@@ -45,9 +45,9 @@ function Home(): React.ReactElement {
   }
 
   return (
-    <div className='flex h-full w-full flex-col items-center justify-center p-4'>
-      <img className='h-48' src={logoURL} alt='uno logo' />
-      <div className='mt-10 flex flex-col'>
+    <div className='flex flex-1 bg-red-100 flex-col items-center justify-center p-4'>
+      <img className='h-40 lg:h-44' src={logoURL} alt='uno logo' />
+      <div className='mt-16 flex flex-col'>
         <label
           htmlFor={`${GameAction.Host}-modal`}
           className='btn-wide btn mb-4'
