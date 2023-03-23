@@ -77,7 +77,8 @@ def on_leave(data):
 
         # Remove player from game
         game = state.get_game_by_room(room)
-        game.remove_player(player)
+        if game:
+            game.remove_player(player)
 
         # Remove player from room
         state.remove_player_from_room(room, player)
