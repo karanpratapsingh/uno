@@ -38,7 +38,9 @@ function UnoCard(props: UnoCardProps): React.ReactElement {
       onClick={() => allowPlay && onClick(currentPlayer.id, card.id)}
       className={`mr-4 flex items-center justify-center ${clsx(
         cardSizes[size],
-        !onClick && 'no-pointer'
+        !onClick && 'no-pointer',
+        onClick &&
+          'hover:scale-110 transition-transform duration-200 ease-in-out'
       )}`}
     >
       <img src={imageSrc} alt={hidden ? 'hidden' : card.id} />
