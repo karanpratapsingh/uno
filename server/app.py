@@ -53,6 +53,11 @@ def on_join(data):
         join_room(room)
         log.info(f"{player} has joined the room {room}")
 
+        # Start game if game already exists
+        game = state.get_game_by_room(room)
+        if game:
+            emit(events.GAME_START, to=room)
+
         # Add extra player for debugging
         if env.ENVIRONMENT == "debug":
             dev_player = Player("developer")

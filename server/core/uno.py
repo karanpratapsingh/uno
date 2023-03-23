@@ -84,15 +84,6 @@ class GameOverReason(Enum):
 
 
 class Game:
-
-    def remove_player(self, player) -> None:
-        self.players.remove(player)
-
-    def validate_players(self) -> None:
-        if len(self.players) < 2:
-            raise Exception("need at least 2 players to start the game")
-            return
-
     def __init__(self, room: str, players: Set[Player], hand_size: int):
         self.hands: DefaultDict[Player, List[Card]] = collections.defaultdict(list)
         self.players: Set[Player] = players
@@ -120,6 +111,14 @@ class Game:
             top_card = random.choice(self.remaining_cards)
 
         self.game_stack: List[Card] = [top_card]
+
+    def remove_player(self, player) -> None:
+        self.players.remove(player)
+
+    def validate_players(self) -> None:
+        if len(self.players) < 2:
+            raise Exception("need at least 2 players to start the game")
+            return
 
     def get_state(self) -> Tuple[DefaultDict[Player, List[Card]], Card]:
         self.validate_players()
