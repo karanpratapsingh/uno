@@ -70,11 +70,15 @@ function Game(props: GameProps): React.ReactElement {
   }, []);
 
   function playCard(playerId: string, cardId: string): void {
-    socket.emit(Events.GAME_PLAY, { playerId, cardId, room });
+    socket.emit(Events.GAME_PLAY, {
+      player_id: playerId,
+      card_id: cardId,
+      room,
+    });
   }
 
   function drawCard(): void {
-    socket.emit(Events.GAME_DRAW, { playerId: currentPlayer.id, room });
+    socket.emit(Events.GAME_DRAW, { player_id: currentPlayer.id, room });
   }
 
   const gameLoaded = started && hands && topCard && players.length > 1;

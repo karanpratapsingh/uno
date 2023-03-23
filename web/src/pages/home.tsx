@@ -45,7 +45,7 @@ function Home(): React.ReactElement {
   }
 
   return (
-    <div className='flex flex-1 bg-red-100 flex-col items-center justify-center p-4'>
+    <div className='flex flex-1 flex-col items-center justify-center p-4'>
       <img className='h-40 lg:h-44' src={logoURL} alt='uno logo' />
       <div className='mt-16 flex flex-col'>
         <label
