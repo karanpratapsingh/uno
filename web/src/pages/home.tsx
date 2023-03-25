@@ -36,7 +36,7 @@ function Home(): React.ReactElement {
       }
 
       navigate(Routes.Play, {
-        state: { action, name, room, hand_size } as GameConfig,
+        state: { action, name, room, hand_size } satisfies GameConfig,
       });
     } catch (error) {
       console.error(error);
