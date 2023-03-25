@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
+import { version } from '../../../package.json';
 import { GameConfig } from '../../types/game';
 
 interface InfoMenuProps {
@@ -24,17 +25,20 @@ function InfoMenu(props: InfoMenuProps): React.ReactElement {
               className={clsx(
                 isConnected && 'badge-success',
                 !isConnected && 'badge-error',
-                'badge-outline badge ml-2'
+                'badge-outline badge'
               )}
             >
               {isConnected ? 'online' : 'offline'}
             </div>
           </div>
           <p className='flex justify-between'>
-            <b>player</b> <span className='ml-2'>{config.name}</span>
+            <b>player</b> <span>{config.name}</span>
           </p>
           <p className='flex justify-between'>
-            <b>room</b> <span className='ml-2'>{config.room}</span>
+            <b>room</b> <span>{config.room}</span>
+          </p>
+          <p className='flex justify-between'>
+            <b>version</b> <span>{version}</span>
           </p>
         </div>
       </div>
