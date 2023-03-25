@@ -38,6 +38,9 @@ class State:
         started = bool(self.get_game_by_room(room))
         players = self.get_players_by_room(room)
 
+        if len(players) == Game.MAX_PLAYERS_ALLOWED:
+            return (False, f"room is full, max {Game.MAX_PLAYERS_ALLOWED} players are supported")
+
         if started:
             if player not in players:
                 return (False, f'cannot join, game in the room {room} has already started')

@@ -153,7 +153,7 @@ function Play(): React.ReactElement {
       />
     );
   } else {
-    let status = 'Waiting for other players to the join...';
+    let status = 'Waiting for more players to the join...';
 
     if (players.length > 1) {
       status = 'Waiting for the game to start...';
@@ -166,8 +166,8 @@ function Play(): React.ReactElement {
             <Avatar key={player.id} name={player.name} />
           ))}
         </div>
-        <span className='mt-6 text-xl italic text-gray-500'>{status}</span>
-        <button onClick={onGameStart} className='btn-wide btn mt-8 mb-4'>
+        <span className='my-8 text-xl italic text-gray-500'>{status}</span>
+        <button onClick={onGameStart} className='btn-wide btn mb-4'>
           Start
         </button>
         <button onClick={onCopyLink} className='btn-wide btn-ghost btn text-sm'>

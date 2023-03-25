@@ -83,6 +83,9 @@ class GameOverReason(Enum):
 
 
 class Game:
+    MIN_PLAYERS_ALLOWED = 2
+    MAX_PLAYERS_ALLOWED = 2
+
     def __init__(self, room: str, players: Set[Player], hand_size: int):
         self.hands: DefaultDict[Player, List[Card]] = collections.defaultdict(list)
         self.players: Set[Player] = players
@@ -115,8 +118,8 @@ class Game:
         self.players.remove(player)
 
     def validate_players(self) -> None:
-        if len(self.players) < 2:
-            raise Exception("need at least 2 players to start the game")
+        if len(self.players) < self.MIN_PLAYERS_ALLOWED:
+            raise Exception(f"need at least {self.MIN_PLAYERS_ALLOWED} players to start the game")
             return
 
     def get_state(self) -> Tuple[DefaultDict[Player, List[Card]], Card]:
