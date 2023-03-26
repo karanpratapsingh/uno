@@ -2,12 +2,12 @@
 
 Classic UNO card game implemented with React and Python using [Socket.IO](https://socket.io/) for realtime multiplayer functionality.
 
-## Screenshots
+## 📷 Screenshots
 
 <img width="50%" src="./docs/images/home.png"><img width="50%" src="./docs/images/game.png">
 <img width="50%" src="./docs/images/room.png"><img width="50%" src="./docs/images/host.png">
 
-## Development
+## 💻 Development
 
 **Server**
 
@@ -27,7 +27,7 @@ $ pnpm install
 $ pnpm run dev
 ```
 
-## Potential Improvements
+## 📖 TODO
 
 - [ ] Better game validation rules
 - [ ] Implement game log
