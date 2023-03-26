@@ -6,8 +6,7 @@ _Check it out [here](https://uno-web-4m6k.onrender.com)_
 
 ## Screenshots
 
-<img width="50%" src="./docs/images/home.png"><img width="50%" src="./docs/images/host.png">
-<img width="50%" src="./docs/images/room.png"><img width="50%" src="./docs/images/game.png">
+<img width="33%" src="./docs/images/home.png"><img width="33%" src="./docs/images/room.png"><img width="33%" src="./docs/images/game.png">
 
 ## Development
 
