@@ -128,14 +128,29 @@ class Game:
 
         return (self.hands, top_card)
 
-    def get_top_card(self):
+    def get_top_card(self) -> Card:
         return self.game_stack[-1]
+
+    def transfer_played_cards(self) -> None:
+        played_cards = self.game_stack[::]
+        played_cards.pop()  # Remove the top card
+
+        random.shuffle(played_cards)  # Shuffle played card
+        self.remaining_cards = played_cards[::]
+        self.game_stack = [self.get_top_card()]
 
     def draw(self, player_id: str) -> None:
         self.validate_players()
 
         player = self.find_object(self.players, player_id)
         player_cards = self.hands[player]
+
+        if not self.remaining_cards:
+            self.transfer_played_cards()
+
+        if not self.remaining_cards:
+            self.notify.warn('deck is empty!')
+            return
 
         new_card = self.remaining_cards.pop()
         player_cards.append(new_card)
