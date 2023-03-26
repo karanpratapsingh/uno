@@ -29,10 +29,10 @@ $ pnpm run dev
 
 ## Potential Improvements
 
-- [] Better game validation rules
-- [] Implement game log
-- [] Host can kick player from room
-- [] Place chance logic
-- [] Generate random player name
-- [] Player can remove a card from hand
-- [] Migrate to a message broker like NATS?
+- [ ] Better game validation rules
+- [ ] Implement game log
+- [ ] Host can kick player from room
+- [ ] Place chance logic
+- [ ] Generate random player name
+- [ ] Player can remove a card from hand
+- [ ] Migrate to a message broker like NATS?
