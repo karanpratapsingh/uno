@@ -160,7 +160,10 @@ def on_play_game(data):
                 emit(events.GAME_OVER, {'reason': reason.value, 'winner': data.name}, to=room)
             state.delete_all(room)
 
-        game.play(player_id, card_id, on_game_over)
+        try:
+            game.play(player_id, card_id, on_game_over)
+        except ValueError as e:
+            log.error(e)
 
         game_state = game.get_state()
         emit(events.GAME_STATE, parse_game_state(game_state), to=room)
