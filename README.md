@@ -2,6 +2,8 @@
 
 Classic UNO card game implemented with React and Python using [Socket.IO](https://socket.io/) for realtime multiplayer functionality.
 
+_Note: I made this for fun and personal use, please don't use this code in production._
+
 ## 📷 Screenshots
 
 <img width="50%" src="./docs/images/home.png"><img width="50%" src="./docs/images/game.png">
