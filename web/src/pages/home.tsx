@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Footer from '../components/footer';
 import StartModal from '../components/modals/start';
 import { allowPlayer } from '../lib/api';
 import { logoURL } from '../lib/image';
@@ -45,25 +46,27 @@ function Home(): React.ReactElement {
   }
 
   return (
-    <div className='flex flex-1 flex-col items-center justify-center'>
-      <img className='h-40 lg:h-44' src={logoURL} alt='uno logo' />
-      <div className='mt-16 flex flex-col'>
-        <label
-          htmlFor={`${GameAction.Host}-modal`}
-          className='btn-wide btn mb-4'
-        >
-          Host
-        </label>
-        <label
-          htmlFor={`${GameAction.Join}-modal`}
-          className='btn-outline btn-ghost btn-wide btn'
-        >
-          Join
-        </label>
+    <div className='flex flex-1 flex-col px-6 py-4'>
+      <div className='flex flex-1 flex-col items-center justify-center'>
+        <img className='h-40 lg:h-44' src={logoURL} alt='uno logo' />
+        <div className='mt-16 flex flex-col'>
+          <label
+            htmlFor={`${GameAction.Host}-modal`}
+            className='btn-wide btn mb-4'
+          >
+            Host
+          </label>
+          <label
+            htmlFor={`${GameAction.Join}-modal`}
+            className='btn-outline btn-ghost btn-wide btn'
+          >
+            Join
+          </label>
+        </div>
       </div>
-
       <StartModal action={GameAction.Host} onStart={onStart} />
       <StartModal action={GameAction.Join} onStart={onStart} />
+      <Footer />
     </div>
   );
 }

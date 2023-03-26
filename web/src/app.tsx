@@ -30,14 +30,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <div className='flex h-full w-full px-6 py-4'>
-      <RouterProvider router={router} />
-      <ToastContainer
-        transition={Slide}
-        position='bottom-right'
-        theme='colored'
-        hideProgressBar
-      />
-    </div>
+    <RouterProvider router={router} />
+    <ToastContainer
+      transition={Slide}
+      position='bottom-right'
+      theme='colored'
+      hideProgressBar
+    />
   </React.StrictMode>
 );

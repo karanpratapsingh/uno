@@ -14,10 +14,10 @@ function Won(): React.ReactElement {
   }, [state]);
 
   return (
-    <div className='flex flex-1 flex-col items-center justify-center'>
+    <div className='flex h-full w-full flex-col items-center justify-center'>
       <Confetti />
       <p className='text-4xl xl:text-6xl mb-8'>{state?.winner} won! 🎉</p>
-      <Link to={Routes.Home} className='btn mt-8'>
+      <Link to={Routes.Home} className='btn mt-4'>
         Play again
       </Link>
     </div>

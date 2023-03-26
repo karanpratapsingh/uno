@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { version } from '../../../package.json';
 import { GameConfig } from '../../types/game';
 
 interface InfoMenuProps {
@@ -36,9 +35,6 @@ function InfoMenu(props: InfoMenuProps): React.ReactElement {
           </p>
           <p className='flex justify-between'>
             <b>room</b> <span>{config.room}</span>
-          </p>
-          <p className='flex justify-between'>
-            <b>version</b> <span>{version}</span>
           </p>
         </div>
       </div>

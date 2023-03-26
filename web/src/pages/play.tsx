@@ -166,8 +166,8 @@ function Play(): React.ReactElement {
             <Avatar key={player.id} name={player.name} />
           ))}
         </div>
-        <span className='my-8 text-xl italic text-gray-500'>{status}</span>
-        <button onClick={onGameStart} className='btn-wide btn mb-4'>
+        <span className='my-6 text-xl italic text-gray-500'>{status}</span>
+        <button onClick={onGameStart} className='btn-wide btn mt-2 mb-4'>
           Start
         </button>
         <button onClick={onCopyLink} className='btn-wide btn-ghost btn text-sm'>
@@ -179,7 +179,7 @@ function Play(): React.ReactElement {
   }
 
   return (
-    <div className='flex flex-1 flex-col'>
+    <div className='flex h-full w-full flex-col px-6 py-4'>
       <Header
         socket={socket}
         isConnected={isConnected}
