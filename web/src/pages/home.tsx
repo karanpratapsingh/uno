@@ -40,12 +40,12 @@ function Home(): React.ReactElement {
       });
     } catch (error) {
       console.error(error);
-      toast.error('encountered error while joining game');
+      toast.error('encountered error while joining the game');
     }
   }
 
   return (
-    <div className='flex flex-1 flex-col items-center justify-center p-4'>
+    <div className='flex flex-1 flex-col items-center justify-center'>
       <img className='h-40 lg:h-44' src={logoURL} alt='uno logo' />
       <div className='mt-16 flex flex-col'>
         <label

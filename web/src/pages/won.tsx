@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import Confetti from 'react-confetti';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Routes } from '../types/routes';
 
 function Won(): React.ReactElement {
@@ -13,17 +13,13 @@ function Won(): React.ReactElement {
     }
   }, [state]);
 
-  function onPlayAgain(): void {
-    navigate(Routes.Home);
-  }
-
   return (
-    <div className='flex h-full w-full flex-col items-center justify-center'>
+    <div className='flex flex-1 flex-col items-center justify-center'>
       <Confetti />
       <p className='text-4xl xl:text-6xl mb-8'>{state?.winner} won! 🎉</p>
-      <button onClick={onPlayAgain} className='btn mt-8'>
+      <Link to={Routes.Home} className='btn mt-8'>
         Play again
-      </button>
+      </Link>
     </div>
   );
 }

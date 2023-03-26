@@ -179,7 +179,7 @@ function Play(): React.ReactElement {
   }
 
   return (
-    <div className='flex h-full w-full flex-col px-6 py-4'>
+    <div className='flex flex-1 flex-col'>
       <Header
         socket={socket}
         isConnected={isConnected}
