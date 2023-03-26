@@ -1,8 +1,6 @@
-# UNO
+# [UNO](https://uno-web-4m6k.onrender.com)
 
 Classic UNO card game implemented with React and Python using [Socket.IO](https://socket.io/) for realtime multiplayer functionality.
-
-_Check it out [here](https://uno-web-4m6k.onrender.com)_
 
 ## Screenshots
 
