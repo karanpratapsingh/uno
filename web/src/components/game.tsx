@@ -103,7 +103,7 @@ function Game(props: GameProps): React.ReactElement {
           type='row'
         />
 
-        <div className='flex flex-1 overflow-x-scroll items-center justify-center'>
+        <div className='flex flex-1 overflow-x-scroll items-center justify-start'>
           <div className='flex'>
             {otherCards.map((card: Card, index: number) => (
               <UnoCard
@@ -134,7 +134,7 @@ function Game(props: GameProps): React.ReactElement {
 
       {/* Current Player */}
       <div className='flex flex-1 flex-col justify-center'>
-        <div className='flex flex-1 overflow-x-scroll items-center justify-center'>
+        <div className='flex flex-1 overflow-x-scroll items-center justify-start'>
           <div className='flex'>
             {ownCards.map((card: Card, index: number) => (
               <UnoCard
